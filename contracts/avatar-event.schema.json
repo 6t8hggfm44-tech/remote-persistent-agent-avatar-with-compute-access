@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed avatar protocol common envelope v0.1",
+  "description": "Envelope only. Per-type payload validation, authenticated ownership and replay checks are mandatory before runtime use.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol_version",
+    "type",
+    "session_id",
+    "utterance_id",
+    "playback_generation",
+    "sequence",
+    "payload"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": "0.1"
+    },
+    "type": {
+      "enum": [
+        "renderer.hello",
+        "renderer.ready",
+        "speech.begin",
+        "speech.chunk",
+        "speech.end",
+        "speech.cancel",
+        "playback.progress",
+        "playback.stopped",
+        "presentation.state",
+        "heartbeat",
+        "error"
+      ]
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "utterance_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 128
+    },
+    "playback_generation": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "payload": {
+      "type": "object"
+    }
+  }
+}

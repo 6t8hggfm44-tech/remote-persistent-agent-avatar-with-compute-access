@@ -1,0 +1,7 @@
+# Prompt for a later authorized backend build
+
+Use only after Pete chooses the implementation scope. Adjust the bounded milestone to his actual request.
+
+> Implement the local persistent-agent prototype from this repository's build pack. Read AGENTS.md, project.json, agent/state.json, the task graph and backend workflow. This scope is B0–B4 excluding B2b (the deferred live-governance gate) with synthetic data and mock tools, unless my current instruction explicitly broadens it. Build a runnable API, database, durable worker, governance-loader tests, task/approval gateway and minimal useful interface. Do not purchase services, make paid API calls, deploy publicly, connect personal accounts or enable recurrence from this prompt alone. Do not activate EA merely because the project is about EA; if my invocation actually requests EA, first complete live initialization. Preserve existing changes. Implement the smallest useful increments, run the specified recovery/authorization tests, persist source and sanitized evidence, verify the remote repository write, and record the next task. Prepare concrete choices for any genuine missing permission rather than repeatedly asking about actions already covered. Stop at the selected milestone and report what actually runs.
+
+For a later live/deployment phase, explicitly extend the scope to the selected B5–B10 tasks, approved accounts, budget, hosting and data handling. Do not infer that extension from this text.

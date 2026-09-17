@@ -1,0 +1,7 @@
+# Prompt for a later authorized avatar build
+
+Use after a workstation and its relevant access/spending scope have been established.
+
+> Implement the avatar feasibility milestone A0–A2 from this repository. Read AGENTS.md, current state, task dependencies, the workstation and avatar workflows, and integration contracts. Prove the available remote access path, pin the engine/compiler/plugin profile, create one minimal MetaHuman scene, and demonstrate arbitrary speech driving facial animation in a packaged Windows executable with the Unreal Editor closed. Use synthetic audio first. Verified desktop execution of reviewed scripts is sufficient; the persistent compute runner is not required yet. Do not add scene polish before the runtime solver passes. If that solver is unsupported, preserve evidence and prepare one concrete alternate route with cost/licensing/compatibility details. Do not buy a plugin, replace the workstation or change scope without existing authorization. Record actual versions, build/package hashes, resource measurements, cancellation behavior and remaining blockers. Do not activate EA unless the current instruction invokes it; if invoked, initialize from the live controls first. Stop after the authorized feasibility milestone.
+
+After success, an explicitly extended scope can include A3–A5 and B7 integration. A6 Pixel Streaming, Realtime voice, native applications and 24/7 rendering remain optional projects.

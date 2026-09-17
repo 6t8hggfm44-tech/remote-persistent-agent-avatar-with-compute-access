@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "as_of": "2026-09-17",
+  "planning_status": "complete",
+  "implementation_status": "not_started",
+  "runtime_test_status": "not_run",
+  "ea_active": false,
+  "ea_initialization_completed": false,
+  "deployed_endpoint": null,
+  "active_run_id": null,
+  "approved_spending": null,
+  "enabled_schedules": [],
+  "runtime_grants": [],
+  "completed_build_tasks": [],
+  "last_completed_work": "Research, design, execution instructions and handoff bundle",
+  "next_action": "Wait for Pete to select next implementation scope; then inspect current repository and authorize required access.",
+  "recommended_first_milestone": [
+    "B0",
+    "B1",
+    "B2a",
+    "B3",
+    "B4"
+  ],
+  "parallel_preparation": [
+    "W0 quote preparation only",
+    "W1/W2 preflight script preparation"
+  ],
+  "open_decisions": [
+    "hosting and identity",
+    "GPU quote and remote access",
+    "API usage cap and models",
+    "private state/assets/evidence stores",
+    "packaged runtime facial solver"
+  ],
+  "state_privacy": "public_sanitized_summary; actual run records stay private",
+  "restart_rule": "Infrastructure restart never activates EA or revives ended/revoked scope; resume only still-valid authorized work after required checks."
+}

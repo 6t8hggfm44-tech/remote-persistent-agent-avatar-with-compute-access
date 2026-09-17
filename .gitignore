@@ -1,0 +1,22 @@
+# Runtime/private data never belongs in this public plan/code repository.
+.env
+.env.*
+!.env.example
+secrets/
+private/
+runtime-data/
+recordings/
+private-evidence/
+*.key
+*.pem
+*.sqlite*
+*.db
+__pycache__/
+node_modules/
+.venv/
+Binaries/
+Intermediate/
+DerivedDataCache/
+Saved/
+*.zip
+.DS_Store

@@ -1,0 +1,58 @@
+{
+  "example_only": true,
+  "selected": false,
+  "backend": {
+    "python": null,
+    "fastapi": null,
+    "postgresql": null,
+    "container_digest": null
+  },
+  "frontend": {
+    "node": null,
+    "react": null,
+    "lockfile_hash": null
+  },
+  "voice": {
+    "mode": "chained_push_to_talk",
+    "model": null,
+    "transcription_model": null,
+    "speech_model": null,
+    "stock_voice": null,
+    "future_live_API_profile": null
+  },
+  "workstation": {
+    "provider": null,
+    "region": null,
+    "SKU": null,
+    "windows_version": null,
+    "GPU": null,
+    "VRAM_GB": null,
+    "RAM_GB": null,
+    "free_disk_GB": null
+  },
+  "avatar": {
+    "engine_version": null,
+    "compiler": null,
+    "windows_SDK": null,
+    "MetaHuman_version": null,
+    "runtime_solver": null,
+    "solver_version": null,
+    "packaged_runtime_verified": false,
+    "artifact_sha256": null
+  },
+  "audio": {
+    "encoding": "pcm_s16le",
+    "sample_rate_hz": 24000,
+    "channels": 1,
+    "speech_owner": "Unreal_in_avatar_mode_browser_in_voice_only_mode",
+    "avatar_delivery_transport": "Shadow_initially",
+    "mic_owner": "local_browser"
+  },
+  "storage": {
+    "private_state_ref": null,
+    "private_assets_ref": null,
+    "private_evidence_ref": null,
+    "secret_store_ref": null
+  },
+  "not_secret_values": "Only names/references belong here; actual identifiers and secrets may need private configuration."
+}

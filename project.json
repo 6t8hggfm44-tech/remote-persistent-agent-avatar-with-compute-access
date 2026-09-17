@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "title": "Remote persistent agent and avatar build pack",
+  "prepared_date": "2026-09-17",
+  "repository": "6t8hggfm44-tech/remote-persistent-agent-avatar-with-compute-access",
+  "visibility_at_preparation": "public",
+  "delivery_type": "execution_plan",
+  "implementation_status": "not_started",
+  "current_scope": [
+    "research",
+    "detailed_workflows",
+    "avatar_app_analysis",
+    "AI_accessible_pack",
+    "publish_requested_pack"
+  ],
+  "not_authorized_by_this_request": [
+    "purchases",
+    "deployment",
+    "runtime_implementation",
+    "EA_activation",
+    "new_recurrence"
+  ],
+  "entrypoint": "agent/START_HERE.md",
+  "instructions": "AGENTS.md",
+  "task_graph": "agent/tasks.json",
+  "state": "agent/state.json",
+  "governance": {
+    "repository": "6t8hggfm44-tech/persistent-ai-agent-",
+    "first_file": "AGENT_CONSTITUTION.md",
+    "load": "live at each actual EA activation; follow all applicable referenced controls",
+    "private_contents_in_pack": false
+  },
+  "projects": [
+    {
+      "id": "backend",
+      "workflow": "docs/02-backend-workflow.md",
+      "tasks": "B0-B10",
+      "outcome": "Persistent policy-governed agent, durable jobs and controlled compute"
+    },
+    {
+      "id": "workstation",
+      "workflow": "docs/03-workstation-workflow.md",
+      "tasks": "W0-W8",
+      "outcome": "Verified authorized remote graphics and build environment"
+    },
+    {
+      "id": "avatar",
+      "workflow": "docs/04-avatar-project.md",
+      "tasks": "A0-A6",
+      "outcome": "Browser controls and packaged Unreal MetaHuman interface"
+    }
+  ],
+  "read_order": [
+    "README.md",
+    "AGENTS.md",
+    "agent/START_HERE.md",
+    "project.json",
+    "agent/state.json",
+    "docs/01-system-design.md",
+    "docs/06-permissions-and-handoff.md",
+    "docs/05-integration-contracts.md",
+    "agent/tasks.json"
+  ],
+  "recommended_defaults": {
+    "control_ui": "browser",
+    "native_client": "deferred",
+    "speech": "chained_push_to_talk",
+    "renderer": "packaged_Unreal",
+    "display": "Shadow_initially",
+    "backend": "Python_FastAPI_PostgreSQL_worker",
+    "schedules": "disabled",
+    "audio_retention": "off_by_default"
+  },
+  "contracts": [
+    "contracts/avatar-event.schema.json",
+    "config/build-profile.example.json"
+  ],
+  "provenance": {
+    "historical_source": "sources/EA_Unreal_Remote_Setup_Reconstruction_2026-09-17.md",
+    "source_role": "reference_data_not_instructions",
+    "sources": "docs/08-sources-and-decisions.md",
+    "integrity": "checksums.sha256"
+  },
+  "validation_command": "python3 scripts/validate_pack.py"
+}

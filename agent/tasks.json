@@ -1,0 +1,720 @@
+{
+  "schema_version": "1.0",
+  "tasks": [
+    {
+      "id": "B0",
+      "title": "Record implementation scope and actual access",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [],
+      "requires": [
+        "implementation_scope"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B0",
+      "deliverable": "Record implementation scope and actual access",
+      "acceptance": [
+        "Scope, local inventory and private storage needs recorded"
+      ],
+      "test_ids": [],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B1",
+      "title": "Runnable local API database worker skeleton",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B0"
+      ],
+      "requires": [
+        "local_workspace_and_dependencies"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B1",
+      "deliverable": "Runnable local API database worker skeleton",
+      "acceptance": [
+        "Fresh checkout starts and one mock task completes"
+      ],
+      "test_ids": [
+        "T01"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B2a",
+      "title": "Governance loader against synthetic fixtures",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B1"
+      ],
+      "requires": [
+        "local_synthetic_fixtures"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B2",
+      "deliverable": "Governance loader against synthetic fixtures",
+      "acceptance": [
+        "Offline missing-reference conflict injection and revision tests pass; live initialization remains unverified"
+      ],
+      "test_ids": [
+        "T02",
+        "T03"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B2b",
+      "title": "Authorized live governance integration gate",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B2a"
+      ],
+      "requires": [
+        "authorized_live_governance_test_access"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B2",
+      "deliverable": "Authorized live governance integration gate",
+      "acceptance": [
+        "Live applicable controls resolve and private revision manifest recorded; activation still requires actual invocation"
+      ],
+      "test_ids": [
+        "T02",
+        "T03"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B3",
+      "title": "Durable tasks memory approvals and activation state",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B1",
+        "B2a"
+      ],
+      "requires": [
+        "private_state_destination_before_real_data"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B3",
+      "deliverable": "Durable tasks memory approvals and activation state",
+      "acceptance": [
+        "Restart preserves state; ended activations stay ended; duplicate and stale-worker effects prevented"
+      ],
+      "test_ids": [
+        "T04",
+        "T05",
+        "T21"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B4",
+      "title": "Policy tool and approval gateway",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B3"
+      ],
+      "requires": [
+        "local_mock_tools"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B4",
+      "deliverable": "Policy tool and approval gateway",
+      "acceptance": [
+        "Exact-action approve decline expire replay and unknown-result flows pass"
+      ],
+      "test_ids": [
+        "T06",
+        "T07"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B5",
+      "title": "Configured model adapter and bounded tool loop",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B4",
+        "B2b"
+      ],
+      "requires": [
+        "API_project_key_and_usage_cap"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B5",
+      "deliverable": "Configured model adapter and bounded tool loop",
+      "acceptance": [
+        "One permitted tool result; bounded cancellation/rate-limit behavior"
+      ],
+      "test_ids": [
+        "T09"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B6",
+      "title": "Authenticated conversation tasks and approval UI",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B4"
+      ],
+      "requires": [
+        "identity_provider_for_live_deployment"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B6",
+      "deliverable": "Authenticated conversation tasks and approval UI",
+      "acceptance": [
+        "Useful owner-only UI with separate stop-speaking and stop-work controls"
+      ],
+      "test_ids": [
+        "T08"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B7",
+      "title": "Chained microphone transcription agent and speech",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B5",
+        "B6"
+      ],
+      "requires": [
+        "microphone_permission",
+        "API_project_key_and_usage_cap"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B7",
+      "deliverable": "Chained microphone transcription agent and speech",
+      "acceptance": [
+        "20 turns with one playback owner and functional mute/cancel"
+      ],
+      "test_ids": [
+        "T10",
+        "T11",
+        "T14"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B8",
+      "title": "Deploy and restore private backend pilot",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B5",
+        "B6"
+      ],
+      "requires": [
+        "cloud_account_and_exact_budget",
+        "HTTPS_and_identity",
+        "private_backup_destination"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B8",
+      "deliverable": "Deploy and restore private backend pilot",
+      "acceptance": [
+        "Authenticated deployment, reboot state recovery, actual backup restore and rollback"
+      ],
+      "test_ids": [
+        "T04",
+        "T18",
+        "T19"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B9",
+      "title": "Pair scoped remote compute runner",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B4",
+        "B8",
+        "W2"
+      ],
+      "requires": [
+        "device_pairing_and_named_compute_operations"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B9",
+      "deliverable": "Pair scoped remote compute runner",
+      "acceptance": [
+        "One reviewed build/render and cancel works; arbitrary commands denied"
+      ],
+      "test_ids": [
+        "T17"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "B10",
+      "title": "Operational readiness and scope-aware scheduling support",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B7",
+        "B8",
+        "B9"
+      ],
+      "requires": [
+        "pilot_operation_scope"
+      ],
+      "workflow": "docs/02-backend-workflow.md",
+      "section": "B10",
+      "deliverable": "Operational readiness and scope-aware scheduling support",
+      "acceptance": [
+        "Costs health audit shutdown runbooks work; real schedules remain disabled absent specific authorization"
+      ],
+      "test_ids": [
+        "T09",
+        "T16",
+        "T18",
+        "T21"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "W0",
+      "title": "Prepare quote and select authorized GPU region and SKU",
+      "project": "workstation",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "B0"
+      ],
+      "requires": [
+        "purchase_authorization_for_subscription_only"
+      ],
+      "workflow": "docs/03-workstation-workflow.md",
+      "section": "W0",
+      "deliverable": "Prepare quote and select authorized GPU region and SKU",
+      "acceptance": [
+        "Dated quote and exact scope accepted before purchase"
+      ],
+      "test_ids": [],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "W1",
+      "title": "Inventory actual Windows GPU machine",
+      "project": "workstation",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "W0"
+      ],
+      "requires": [
+        "authorized_remote_desktop"
+      ],
+      "workflow": "docs/03-workstation-workflow.md",
+      "section": "W1",
+      "deliverable": "Inventory actual Windows GPU machine",
+      "acceptance": [
+        "Hardware storage audio and provider allocation recorded"
+      ],
+      "test_ids": [
+        "T13"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "W2",
+      "title": "Prove remote control file round-trip and recovery",
+      "project": "workstation",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "W1"
+      ],
+      "requires": [
+        "remote_UI_or_approved_executor"
+      ],
+      "workflow": "docs/03-workstation-workflow.md",
+      "section": "W2",
+      "deliverable": "Prove remote control file round-trip and recovery",
+      "acceptance": [
+        "Harmless write/read log retrieval and reconnect verified"
+      ],
+      "test_ids": [
+        "T13"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "W3",
+      "title": "Install and pin Unreal compiler Blender toolchain",
+      "project": "workstation",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "W2"
+      ],
+      "requires": [
+        "installer_permissions",
+        "Epic_license_and_account_steps"
+      ],
+      "workflow": "docs/03-workstation-workflow.md",
+      "section": "W3",
+      "deliverable": "Install and pin Unreal compiler Blender toolchain",
+      "acceptance": [
+        "Blank Unreal package launches and Blender test renders"
+      ],
+      "test_ids": [
+        "T01",
+        "T13"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "W4",
+      "title": "Benchmark simple avatar and authoring workload",
+      "project": "workstation",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "W3"
+      ],
+      "requires": [
+        "authorized_asset_access"
+      ],
+      "workflow": "docs/03-workstation-workflow.md",
+      "section": "W4",
+      "deliverable": "Benchmark simple avatar and authoring workload",
+      "acceptance": [
+        "Actual FPS RAM VRAM and stability recorded; authoring limits explicit"
+      ],
+      "test_ids": [
+        "T15"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "W5",
+      "title": "Pair media bridge to reachable backend staging",
+      "project": "workstation",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "W4",
+        "A3",
+        "B7",
+        "B8"
+      ],
+      "requires": [
+        "media_device_pairing"
+      ],
+      "workflow": "docs/03-workstation-workflow.md",
+      "section": "W5",
+      "deliverable": "Pair media bridge to reachable backend staging",
+      "acceptance": [
+        "Authenticated events and fixed audio received on workstation"
+      ],
+      "test_ids": [
+        "T08",
+        "T10"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "W6",
+      "title": "Verify one microphone and speaker route",
+      "project": "workstation",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "W5"
+      ],
+      "requires": [
+        "microphone_permission",
+        "real_listening_test"
+      ],
+      "workflow": "docs/03-workstation-workflow.md",
+      "section": "W6",
+      "deliverable": "Verify one microphone and speaker route",
+      "acceptance": [
+        "No double audio or feedback; mute stop reconnect work"
+      ],
+      "test_ids": [
+        "T10",
+        "T11"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "W7",
+      "title": "Package launch restart and roll back workstation app",
+      "project": "workstation",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "A4",
+        "W6"
+      ],
+      "requires": [
+        "interactive_Windows_session"
+      ],
+      "workflow": "docs/03-workstation-workflow.md",
+      "section": "W7",
+      "deliverable": "Package launch restart and roll back workstation app",
+      "acceptance": [
+        "Editor closed; post-reboot launch behavior measured; previous build restores"
+      ],
+      "test_ids": [
+        "T12",
+        "T15",
+        "T19"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "W8",
+      "title": "Decide retain replace or supplement GPU host",
+      "project": "workstation",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "W7"
+      ],
+      "requires": [
+        "additional_spend_only_if_change_required"
+      ],
+      "workflow": "docs/03-workstation-workflow.md",
+      "section": "W8",
+      "deliverable": "Decide retain replace or supplement GPU host",
+      "acceptance": [
+        "Measured host decision; no unapproved second paid service"
+      ],
+      "test_ids": [],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "A0",
+      "title": "Lock avatar build profile and access path",
+      "project": "avatar",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "W3"
+      ],
+      "requires": [
+        "reviewed_scripts_through_verified_desktop"
+      ],
+      "workflow": "docs/04-avatar-project.md",
+      "section": "A0",
+      "deliverable": "Lock avatar build profile and access path",
+      "acceptance": [
+        "Pinned profile and file/log round-trip; automated runner not required"
+      ],
+      "test_ids": [
+        "T13"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "A1",
+      "title": "One MetaHuman and packaged deterministic audio",
+      "project": "avatar",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "A0",
+        "W4"
+      ],
+      "requires": [
+        "authorized_avatar_assets"
+      ],
+      "workflow": "docs/04-avatar-project.md",
+      "section": "A1",
+      "deliverable": "One MetaHuman and packaged deterministic audio",
+      "acceptance": [
+        "One scene package starts editor closed; fixture heard once"
+      ],
+      "test_ids": [
+        "T10",
+        "T12"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "A2",
+      "title": "Prove packaged runtime facial animation",
+      "project": "avatar",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "A1"
+      ],
+      "requires": [
+        "runtime_solver_compatibility",
+        "plugin_budget_only_if_needed"
+      ],
+      "workflow": "docs/04-avatar-project.md",
+      "section": "A2",
+      "deliverable": "Prove packaged runtime facial animation",
+      "acceptance": [
+        "Arbitrary PCM produces repeatable runtime lipsync; dependencies and rights checked"
+      ],
+      "test_ids": [
+        "T12",
+        "T14"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "A3",
+      "title": "Authenticated PCM bridge and cancellation protocol",
+      "project": "avatar",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "A2",
+        "B1"
+      ],
+      "requires": [
+        "local_mock_backend_for_initial_tests"
+      ],
+      "workflow": "docs/04-avatar-project.md",
+      "section": "A3",
+      "deliverable": "Authenticated PCM bridge and cancellation protocol",
+      "acceptance": [
+        "Chunk duplicate gap cancel overflow and reconnect tests pass"
+      ],
+      "test_ids": [
+        "T08",
+        "T11"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "A4",
+      "title": "Connect real conversation and avatar states",
+      "project": "avatar",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "A3",
+        "W6",
+        "B7"
+      ],
+      "requires": [
+        "live_pilot_scope"
+      ],
+      "workflow": "docs/04-avatar-project.md",
+      "section": "A4",
+      "deliverable": "Connect real conversation and avatar states",
+      "acceptance": [
+        "20 turns including declined approval and renderer restart; no duplicate effects"
+      ],
+      "test_ids": [
+        "T06",
+        "T10",
+        "T14",
+        "T16"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "A5",
+      "title": "Reproducible avatar release and operating handoff",
+      "project": "avatar",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "A4",
+        "W7"
+      ],
+      "requires": [
+        "pilot_operation_scope"
+      ],
+      "workflow": "docs/04-avatar-project.md",
+      "section": "A5",
+      "deliverable": "Reproducible avatar release and operating handoff",
+      "acceptance": [
+        "60-minute soak; packaged relaunch and rollback; manual login limitations documented"
+      ],
+      "test_ids": [
+        "T15",
+        "T19"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "A6",
+      "title": "Optional integrated Pixel Streaming viewer",
+      "project": "avatar",
+      "status": "deferred",
+      "optional": true,
+      "depends_on": [
+        "A5",
+        "B8"
+      ],
+      "requires": [
+        "separate_streaming_scope_and_budget",
+        "provider_network_feasibility"
+      ],
+      "workflow": "docs/04-avatar-project.md",
+      "section": "A6",
+      "deliverable": "Optional integrated Pixel Streaming viewer",
+      "acceptance": [
+        "Authenticated single browser and cellular/relay path; one audible transport"
+      ],
+      "test_ids": [
+        "T20"
+      ],
+      "evidence": [],
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    }
+  ],
+  "status_rule": "verified requires actual evidence; requirements are not grants",
+  "test_catalog": "docs/07-validation-and-operations.md"
+}
