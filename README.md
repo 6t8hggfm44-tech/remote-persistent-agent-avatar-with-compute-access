@@ -1,8 +1,22 @@
 # Remote persistent agent and avatar — build pack
 
-Prepared 2026-09-17. **Status: planning complete; application implementation has not started.**
+Prepared 2026-09-17. **Current status: Presence 0.1 local persona prototype implemented and tested. EA integration is on hold.**
 
 Repository: [remote-persistent-agent-avatar-with-compute-access](https://github.com/6t8hggfm44-tech/remote-persistent-agent-avatar-with-compute-access).
+
+## Open the working local prototype
+
+**Presence 0.1** lets you edit a persona, try explicitly simulated conversations, and create persistent sample tasks. It runs locally with Python 3.9+ and requires no paid services or third-party packages.
+
+```sh
+python3 -B -m app.server --port 8765
+```
+
+Then open [http://127.0.0.1:8765](http://127.0.0.1:8765). On a Mac, `start.command` starts the same service. Keep it running while using the app. [Read the prototype guide, verified behavior and limitations](docs/09-local-prototype.md).
+
+The text responses are scripted previews. Live AI, voice, Unreal and EA are not connected. Conversations and persona settings stay in ignored local `runtime-data/`; they are excluded from Git and the downloadable source bundle.
+
+The detailed roadmap below remains the plan for later stages. This local milestone deliberately uses SQLite and a dependency-free server before moving to the proposed production stack.
 
 ## Recommended outcome
 
@@ -62,10 +76,10 @@ Shadow Power Pro remains a **candidate pilot workstation**. Its listed 28 GB RAM
 
 Epic's live audio facial-animation tools require an early packaging experiment. An editor demonstration does not establish that the same solver works in a distributable Unreal application. The avatar workflow defines the decision and fallback.
 
-No purchases, cloud deployment, EA activation, new recurrence, account authorizations, or runtime software are created by this pack. The current request authorizes preparation and storing the pack in the new repository. Subsequent work starts after Pete selects the next scope.
+The initial planning request created no runtime. Pete subsequently authorized starting the build while setting EA integration aside; the local prototype above is the completed first milestone. Purchases, cloud deployment, live account connections, EA activation and new recurrence remain outside this milestone.
 
 ## Information boundaries
 
 The new repository was public when checked. Keep it suitable for public source and documentation. Private governance, preferences, transcripts, task records, credentials, licensed character assets, and workstation identifiers belong in authorized private storage. The original [reconstruction](sources/EA_Unreal_Remote_Setup_Reconstruction_2026-09-17.md) is historical input, not an instruction to activate or purchase anything. Current instructions and live controlling documents take precedence at execution time.
 
-This is a proposed engineering design with measurable gates, not a claim that the system has already been built or that vendor compatibility is guaranteed.
+The local prototype is implemented. The broader architecture remains a proposed design with measurable gates; cloud/GPU/voice compatibility has not yet been demonstrated.

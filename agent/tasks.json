@@ -49,7 +49,7 @@
       "id": "B2a",
       "title": "Governance loader against synthetic fixtures",
       "project": "backend",
-      "status": "planned",
+      "status": "deferred",
       "optional": false,
       "depends_on": [
         "B1"
@@ -68,13 +68,14 @@
         "T03"
       ],
       "evidence": [],
-      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion.",
+      "deferred_reason": "Pete set EA integration aside."
     },
     {
       "id": "B2b",
       "title": "Authorized live governance integration gate",
       "project": "backend",
-      "status": "planned",
+      "status": "deferred",
       "optional": false,
       "depends_on": [
         "B2a"
@@ -93,7 +94,8 @@
         "T03"
       ],
       "evidence": [],
-      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion.",
+      "deferred_reason": "Pete set EA integration aside."
     },
     {
       "id": "B3",
@@ -713,6 +715,101 @@
       ],
       "evidence": [],
       "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "P0",
+      "title": "Confirm local persona-first scope without EA",
+      "project": "local_prototype",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [],
+      "requires": [
+        "local_implementation_authorized"
+      ],
+      "workflow": "docs/09-local-prototype.md",
+      "section": "Confirm local persona-first scope without EA",
+      "deliverable": "Confirm local persona-first scope without EA",
+      "acceptance": [
+        "Implemented local milestone; limits explicit"
+      ],
+      "test_ids": [],
+      "evidence": [
+        "docs/09-local-prototype.md"
+      ],
+      "on_block": "Report the actual missing capability."
+    },
+    {
+      "id": "P1",
+      "title": "Build editable persona and browser interface",
+      "project": "local_prototype",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [
+        "P0"
+      ],
+      "requires": [
+        "local_implementation_authorized"
+      ],
+      "workflow": "docs/09-local-prototype.md",
+      "section": "Build editable persona and browser interface",
+      "deliverable": "Build editable persona and browser interface",
+      "acceptance": [
+        "Implemented local milestone; limits explicit"
+      ],
+      "test_ids": [],
+      "evidence": [
+        "docs/09-local-prototype.md"
+      ],
+      "on_block": "Report the actual missing capability."
+    },
+    {
+      "id": "P2",
+      "title": "Persist conversations and recoverable mock jobs",
+      "project": "local_prototype",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [
+        "P0"
+      ],
+      "requires": [
+        "local_implementation_authorized"
+      ],
+      "workflow": "docs/09-local-prototype.md",
+      "section": "Persist conversations and recoverable mock jobs",
+      "deliverable": "Persist conversations and recoverable mock jobs",
+      "acceptance": [
+        "Implemented local milestone; limits explicit"
+      ],
+      "test_ids": [],
+      "evidence": [
+        "docs/09-local-prototype.md"
+      ],
+      "on_block": "Report the actual missing capability."
+    },
+    {
+      "id": "P3",
+      "title": "Verify local prototype and publish source",
+      "project": "local_prototype",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [
+        "P1",
+        "P2"
+      ],
+      "requires": [
+        "local_implementation_authorized"
+      ],
+      "workflow": "docs/09-local-prototype.md",
+      "section": "Verify local prototype and publish source",
+      "deliverable": "Verify local prototype and publish source",
+      "acceptance": [
+        "Implemented local milestone; limits explicit"
+      ],
+      "test_ids": [],
+      "evidence": [
+        "docs/09-local-prototype.md"
+      ],
+      "on_block": "Report the actual missing capability."
     }
   ],
   "status_rule": "verified requires actual evidence; requirements are not grants",

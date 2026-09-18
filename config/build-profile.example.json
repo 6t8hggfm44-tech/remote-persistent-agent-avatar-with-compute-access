@@ -54,5 +54,15 @@
     "private_evidence_ref": null,
     "secret_store_ref": null
   },
-  "not_secret_values": "Only names/references belong here; actual identifiers and secrets may need private configuration."
+  "not_secret_values": "Only names/references belong here; actual identifiers and secrets may need private configuration.",
+  "local_prototype": {
+    "python_tested": "3.9.6",
+    "dependencies": "standard library",
+    "database": "sqlite3",
+    "frontend": "HTML CSS JavaScript",
+    "tested_browser": "Codex in-app browser",
+    "version": "0.1.0",
+    "EA_connected": false,
+    "live_AI_connected": false
+  }
 }

@@ -20,3 +20,8 @@ DerivedDataCache/
 Saved/
 *.zip
 .DS_Store
+
+# Local prototype and verification artifacts
+*.log
+.coverage
+.test-data/

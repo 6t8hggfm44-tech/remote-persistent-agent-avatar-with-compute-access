@@ -4,19 +4,19 @@
   "prepared_date": "2026-09-17",
   "repository": "6t8hggfm44-tech/remote-persistent-agent-avatar-with-compute-access",
   "visibility_at_preparation": "public",
-  "delivery_type": "execution_plan",
-  "implementation_status": "not_started",
+  "delivery_type": "execution_plan_and_local_prototype",
+  "implementation_status": "local_persona_prototype_verified",
   "current_scope": [
-    "research",
-    "detailed_workflows",
-    "avatar_app_analysis",
-    "AI_accessible_pack",
-    "publish_requested_pack"
+    "local_persona_app",
+    "simulated_conversation",
+    "persistent_local_tasks",
+    "tests",
+    "source_repository_persistence"
   ],
   "not_authorized_by_this_request": [
     "purchases",
-    "deployment",
-    "runtime_implementation",
+    "cloud_deployment",
+    "EA_integration",
     "EA_activation",
     "new_recurrence"
   ],
@@ -56,6 +56,7 @@
     "agent/START_HERE.md",
     "project.json",
     "agent/state.json",
+    "docs/09-local-prototype.md",
     "docs/01-system-design.md",
     "docs/06-permissions-and-handoff.md",
     "docs/05-integration-contracts.md",
@@ -81,5 +82,14 @@
     "sources": "docs/08-sources-and-decisions.md",
     "integrity": "checksums.sha256"
   },
-  "validation_command": "python3 scripts/validate_pack.py"
+  "validation_command": "python3 scripts/validate_pack.py",
+  "runtime": {
+    "entrypoint": "app/server.py",
+    "start": "python3 -B -m app.server --port 8765",
+    "guide": "docs/09-local-prototype.md",
+    "dependencies": "Python standard library only",
+    "model": "scripted_mock",
+    "database": "SQLite local only",
+    "EA": "deferred_by_user"
+  }
 }

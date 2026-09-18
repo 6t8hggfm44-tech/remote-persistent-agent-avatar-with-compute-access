@@ -7,7 +7,11 @@ from urllib.parse import unquote
 
 root = Path(__file__).resolve().parents[1]
 errors = []
-json_files = sorted(root.rglob('*.json'))
+def public_file(path):
+    relative = path.relative_to(root)
+    return not any(part in {'.git', '__pycache__', 'runtime-data', 'private', 'private-evidence', '.test-data'} for part in relative.parts)
+
+json_files = sorted(p for p in root.rglob('*.json') if public_file(p))
 for path in json_files:
     try:
         json.loads(path.read_text())
@@ -47,7 +51,7 @@ def visit(task_id):
 for task_id in by_id:
     visit(task_id)
 
-for path in sorted(root.rglob('*.md')):
+for path in sorted(p for p in root.rglob('*.md') if public_file(p)):
     content = path.read_text()
     if content.count('```') % 2:
         errors.append(f'Unbalanced fenced block: {path.relative_to(root)}')
@@ -69,7 +73,7 @@ if manifest.exists():
             errors.append(f'Checksum mismatch: {relative}')
     actual = {str(p.relative_to(root)) for p in root.rglob('*')
               if p.is_file() and p != manifest and '.git' not in p.parts
-              and '__pycache__' not in p.parts}
+              and public_file(p)}
     if actual != listed:
         errors.append('Checksum manifest does not match pack file inventory')
 else:
@@ -79,4 +83,4 @@ if errors:
     raise SystemExit('\n'.join(errors))
 print(f'PASS: {len(json_files)} JSON files, {len(tasks)} acyclic tasks, '
       'entry points, Markdown local links/fences and all file hashes.')
-print('Runtime application tests: NOT RUN; implementation has not started.')
+print('Pack checks do not run application tests. See docs/09-local-prototype.md for runtime verification.')

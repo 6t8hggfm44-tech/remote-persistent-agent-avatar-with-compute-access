@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101319">
+  <meta name="description" content="A private local workspace for shaping your agent's persona and trying preview conversations.">
+  <title>Presence — Agent studio</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Workspace navigation">
+      <a class="brand" href="#conversation" aria-label="Presence home"><span class="brand-mark" aria-hidden="true">p</span><span>presence<span class="brand-caption">AGENT STUDIO</span></span></a>
+      <nav class="navigation" aria-label="Main">
+        <button class="nav-button active" data-view="conversation" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6 4V6a2 2 0 0 1 2-2Z"/></svg>Conversation</button>
+        <button class="nav-button" data-view="persona"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg>Persona</button>
+        <button class="nav-button" data-view="activity"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v3H7zM7 5H4v17h16V5h-3M8 12h8M8 17h5"/></svg>Activity<span id="task-count" class="nav-count" hidden>0</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="local-label"><span class="status-dot" aria-hidden="true"></span><span id="connection-label">Connecting locally</span></div>
+        <p>Saved on this computer</p>
+        <div class="workspace-user"><span class="user-initial">P</span><div>Your workspace<small>Local prototype</small></div></div>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar"><div><span class="eyebrow">YOUR AGENT, TAKING SHAPE</span><h1 id="view-title">Conversation</h1></div><span class="preview-badge"><span aria-hidden="true">◈</span> Preview mode</span></header>
+      <div id="offline-banner" class="notice error" role="alert" hidden>Connection lost. Your saved work is still here. Reconnecting…</div>
+      <div class="notice preview-notice"><span class="notice-icon" aria-hidden="true">i</span><p>Responses are simulated in this first version. Live AI, voice, and the 3D avatar are not connected yet.</p></div>
+
+      <section id="view-conversation" class="view conversation-layout" aria-label="Conversation">
+        <div class="presence-column">
+          <article class="presence-card">
+            <div class="card-topline"><span class="section-label">PRESENCE</span><span class="subtle-pill">Visual placeholder</span></div>
+            <div class="orb-stage" aria-hidden="true"><div class="orb-halo"></div><div class="orb"></div><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orb-ground"></div></div>
+            <div class="presence-identity"><h2 id="presence-name">Companion</h2><p id="presence-role">A thoughtful companion for ideas, plans, and creative work.</p></div>
+            <div class="presence-state"><span id="presence-state-icon" aria-hidden="true">◇</span><span id="presence-state">Ready to preview</span></div>
+          </article>
+          <div class="persona-glance"><div><span class="section-label">CURRENT PERSONA</span><button class="text-button" data-view="persona">Edit persona <span aria-hidden="true">↗</span></button></div><p><span id="tone-summary">Warm</span><span class="glance-separator">/</span><span id="length-summary">Balanced replies</span></p></div>
+          <div class="connections-card"><span class="section-label">CONNECTIONS</span><dl><div><dt>Live AI</dt><dd>Not connected</dd></div><div><dt>Voice</dt><dd>Not connected</dd></div><div><dt>Unreal avatar</dt><dd>Not connected</dd></div><div><dt>Executive Agent</dt><dd>On hold</dd></div></dl></div>
+        </div>
+        <article class="conversation-card">
+          <div class="conversation-top"><div><h2>Try a conversation</h2><p>Explore how your persona comes across.</p></div><button id="reset-open" class="icon-button" aria-label="Reset conversation" title="Reset conversation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a9 9 0 1 1 1 8M3 3v7h7"/></svg></button></div>
+          <div id="message-region" class="message-region" role="log" aria-label="Conversation messages" aria-live="polite" aria-relevant="additions">
+            <div id="conversation-empty" class="conversation-empty"><span class="empty-glyph" aria-hidden="true">✳</span><h3>Start with a hello.</h3><p>Give your agent a name and a style,<br>then try a few preview messages.</p><div class="suggestions"><button data-prompt="Introduce yourself">Introduce yourself <span aria-hidden="true">↗</span></button><button data-prompt="Help me plan a creative project">Plan a creative project <span aria-hidden="true">↗</span></button><button data-prompt="How does your persona work?">Explore your persona <span aria-hidden="true">↗</span></button></div></div>
+          </div>
+          <div id="reply-progress" class="reply-progress" role="status" hidden><span class="typing-dots" aria-hidden="true"><i></i><i></i><i></i></span>Preparing a preview reply…<button id="stop-reply" class="text-button">Stop</button></div>
+          <form id="message-form" class="composer"><label class="sr-only" for="message-input">Message your agent</label><textarea id="message-input" placeholder="Say something to your agent…" rows="2" maxlength="4000" required></textarea><div class="composer-bottom"><span class="composer-note">Text preview<span aria-hidden="true"> · </span>Enter to send</span><button id="send-message" class="send-button" type="submit" aria-label="Send message"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7M12 5v15"/></svg></button></div></form>
+        </article>
+      </section>
+
+      <section id="view-persona" class="view persona-layout" aria-label="Edit persona" hidden>
+        <article class="editor-card"><div class="section-heading"><span class="eyebrow">A PERSONALITY YOU CAN SHAPE</span><h2>Make it your own.</h2><p>Choose how your agent introduces itself and responds. You can change any of this later.</p></div>
+          <form id="persona-form">
+            <label class="field-label" for="persona-name">Name</label><input id="persona-name" name="name" maxlength="40" required autocomplete="off">
+            <label class="field-label" for="persona-role">What should your agent help with?</label><input id="persona-role" name="role" maxlength="120" required>
+            <fieldset><legend>Tone</legend><div class="choice-grid tone-choices"><label><input type="radio" name="tone" value="warm"><span><b>Warm</b><small>Friendly and encouraging</small></span></label><label><input type="radio" name="tone" value="direct"><span><b>Direct</b><small>Clear and to the point</small></span></label><label><input type="radio" name="tone" value="thoughtful"><span><b>Thoughtful</b><small>Considered and curious</small></span></label><label><input type="radio" name="tone" value="playful"><span><b>Playful</b><small>Light and imaginative</small></span></label></div></fieldset>
+            <fieldset><legend>Reply length</legend><div class="segmented"><label><input type="radio" name="response_length" value="short"><span>Short</span></label><label><input type="radio" name="response_length" value="balanced"><span>Balanced</span></label><label><input type="radio" name="response_length" value="detailed"><span>Detailed</span></label></div></fieldset>
+            <label class="field-label" for="persona-instructions">Additional direction <span class="optional">Optional</span></label><textarea id="persona-instructions" name="instructions" rows="4" maxlength="2000" placeholder="For example: Be candid, ask thoughtful questions, and keep the humor subtle."></textarea><p class="field-help">Saved for the future AI connection. Preview replies demonstrate the selected tone and length only.</p>
+            <div class="form-actions"><span id="persona-save-status" role="status">Changes are saved when you apply them.</span><button id="persona-save" class="primary-button" type="submit">Save persona</button></div>
+          </form>
+        </article>
+        <aside class="persona-preview"><span class="section-label">PERSONA PREVIEW</span><span class="preview-star" aria-hidden="true">✳</span><h2 id="persona-preview-name">Companion</h2><p id="persona-preview-role"></p><blockquote id="persona-preview-copy"></blockquote><p class="field-help">An example of the selected style. This is not an AI-generated reply.</p><div class="quiet-divider"></div><h3>A persona is the starting point.</h3><p>Your voice and avatar will give it expression. The real AI connection will make the conversation open-ended.</p></aside>
+      </section>
+
+      <section id="view-activity" class="view activity-layout" aria-label="Task activity" hidden>
+        <article class="activity-card"><div class="section-heading"><span class="eyebrow">WORK THAT STAYS WITH YOU</span><h2>Activity</h2><p>Try a sample task. Its status and result are saved locally, even if you close this page.</p></div>
+          <form id="task-form" class="task-form"><label class="sr-only" for="task-title">Sample task title</label><input id="task-title" maxlength="160" placeholder="A project you'd like to outline…" required><button type="submit" class="primary-button">Create sample task</button></form><p class="field-help">Sample tasks create a fixed planning template. They don’t contact services or perform real work.</p>
+          <div id="tasks-list" class="tasks-list" aria-live="polite"><p class="empty-task">No activity yet. Your conversations and sample tasks will appear here.</p></div>
+        </article>
+      </section>
+      <footer class="app-footer"><span>Local prototype · No external services connected</span><span>Presence <span class="version">0.1</span></span></footer>
+    </main>
+  </div>
+  <div id="toast" role="status" class="toast" hidden></div>
+  <dialog id="reset-dialog"><form method="dialog"><span class="eyebrow">START FRESH</span><h2>Reset this conversation?</h2><p>This removes your conversation messages and stops any pending reply. Your persona and task history stay saved.</p><div class="dialog-actions"><button value="cancel" class="secondary-button">Keep conversation</button><button id="reset-confirm" type="button" class="primary-button">Reset conversation</button></div></form></dialog>
+</body>
+</html>
