@@ -1,6 +1,6 @@
 # Remote persistent agent and avatar — build pack
 
-Prepared 2026-09-17; updated 2026-09-18. **Current status: Presence 0.2 adds an OpenAI text connection, verified with synthetic responses. Real API verification awaits user credential entry. EA integration is on hold.**
+Prepared 2026-09-17; updated 2026-09-18. **Current status: Presence 0.2 provides real OpenAI text replies. Two live tests verified the saved persona and recent conversation context. EA integration is on hold.**
 
 Repository: [remote-persistent-agent-avatar-with-compute-access](https://github.com/6t8hggfm44-tech/remote-persistent-agent-avatar-with-compute-access).
 

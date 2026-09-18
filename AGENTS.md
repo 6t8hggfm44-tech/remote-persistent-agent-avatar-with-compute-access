@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-Pete authorized starting implementation and explicitly set EA integration aside. Presence 0.2 implements local persona/conversation/tasks and an optional bounded OpenAI text adapter. Mocked tests pass; real API verification requires user credential entry and current spending authorization. Do not read or activate EA controls for ordinary prototype work. Voice, Unreal, cloud deployment and purchases require their corresponding next-step setup/scope. See `docs/10-live-text-connection.md`.
+Pete authorized starting implementation and explicitly set EA integration aside. Presence 0.2 implements local persona/conversation/tasks and an optional bounded OpenAI text adapter. Mocked tests and two authorized live text tests pass. New API use still requires current spending authorization and a user-connected key. Do not read or activate EA controls for ordinary prototype work. Voice, Unreal, cloud deployment and purchases require their corresponding next-step setup/scope. See `docs/10-live-text-connection.md`.
 
 ## Scope and authority
 

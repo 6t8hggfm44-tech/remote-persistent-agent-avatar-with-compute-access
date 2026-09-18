@@ -5,7 +5,7 @@
   "repository": "6t8hggfm44-tech/remote-persistent-agent-avatar-with-compute-access",
   "visibility_at_preparation": "public",
   "delivery_type": "execution_plan_and_local_prototype",
-  "implementation_status": "local_ai_connection_ready_awaiting_user_key",
+  "implementation_status": "local_live_text_verified",
   "current_scope": [
     "local_persona_app",
     "simulated_conversation",
@@ -93,6 +93,7 @@
     "model": "gpt-5.6-luna optional; preview default",
     "database": "SQLite local only",
     "EA": "deferred_by_user",
-    "credential_storage": "process_memory_only"
+    "credential_storage": "process_memory_only",
+    "live_verified": true
   }
 }

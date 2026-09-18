@@ -843,7 +843,7 @@
       "on_block": "Complete independent work; request only missing user input. Never request secrets in chat.",
       "id": "P5",
       "title": "Verify an authorized live text conversation",
-      "status": "planned",
+      "status": "verified",
       "depends_on": [
         "P4"
       ],
@@ -858,7 +858,9 @@
         "Saved persona and recent context used",
         "Reported usage recorded within authorized allowance"
       ],
-      "evidence": []
+      "evidence": [
+        "docs/10-live-text-connection.md"
+      ]
     }
   ],
   "status_rule": "verified requires actual evidence; requirements are not grants",

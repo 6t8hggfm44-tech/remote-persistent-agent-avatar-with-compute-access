@@ -1,12 +1,12 @@
 # Presence 0.2 — bounded live text connection
 
-The OpenAI connection is implemented and tested with synthetic responses. A real API request has not yet been verified. Credential entry remains a user step. Executive Agent, voice, Unreal rendering and external tools stay deferred.
+The OpenAI connection is implemented and verified with two real text requests on 2026-09-18, following user credential entry and an explicitly authorized initial allowance. Executive Agent, voice, Unreal rendering and external tools stay deferred.
 
 ## Connect and test
 
 1. Start the local app normally. A new data folder starts with zero API allowance. An executor may enable a previously authorized initial test allowance with `python3 -B -m app.server --test-budget-usd 1`; this is a total allowance, not a renewal on each launch. The supported initial allowance is at most $1.
 2. Open [Connection](http://127.0.0.1:8765/#connection). Confirm the intended allowance displayed there.
-3. The user creates a key in the intended funded OpenAI project using [OpenAI API keys](https://platform.openai.com/api-keys), then pastes it directly into the masked field and clicks **Connect OpenAI**. Never ask for the key in chat. The application needs Responses API access to the selected model, not administrative access.
+3. The user creates a key in the intended funded OpenAI project using [OpenAI API keys](https://platform.openai.com/api-keys). Choose **Restricted**, expand **Model capabilities**, and set **Responses (/v1/responses) → Write**. Leave the other child capabilities and **List models** set to **None**. The parent **Model capabilities** label showing **Mixed** is expected because only Responses is enabled. This path was verified in the user's key-creation screen on 2026-09-18; the underlying permission is `api.responses.write`. See [OpenAI permission documentation](https://developers.openai.com/api/docs/guides/rbac) and the [scoped-key example](https://developers.openai.com/api/docs/guides/terraform/service-accounts). The user then pastes the key directly into the masked field and clicks **Connect OpenAI**. Never ask for the key in chat. The application needs Responses API access to the selected model, not administrative access.
 4. Connecting loads the key into server memory and makes no paid request. The interface shows that the key has not yet been verified.
 5. Send a harmless test message in Conversation. For example: “Introduce yourself using my saved persona in one sentence.” A successful reply is labeled AI, the connection becomes verified, and usage is shown on Connection.
 6. Send a brief follow-up to verify recent conversation context and persona behavior. Inspect any failure in Activity before deliberately retrying. Do not automatically change models, increase allowance or resend uncertain requests.
@@ -25,7 +25,7 @@ Restarting the server requires the user to reconnect their key. Repeating the al
 
 ## Initial spending control
 
-The fixed model is `gpt-5.6-luna`, chosen for the initial low-cost text test. Official model documentation checked on 2026-09-18 lists $0.20 per million input tokens and $1.20 per million output tokens; cache writes are $0.25 per million input tokens. Model access for the user's project remains unverified until a successful call. [Model profile](https://developers.openai.com/api/docs/models/gpt-5.6-luna).
+The fixed model is `gpt-5.6-luna`, chosen for the initial low-cost text test. Official model documentation checked on 2026-09-18 lists $0.20 per million input tokens and $1.20 per million output tokens; cache writes are $0.25 per million input tokens. Access to this model was verified with successful live calls on 2026-09-18. [Model profile](https://developers.openai.com/api/docs/models/gpt-5.6-luna).
 
 Requests use `reasoning.effort: none`, the default service tier, no tools, no streaming/background mode, a maximum 30,000-byte serialized payload and 256/512/1,000 output tokens for short/balanced/detailed replies. The last 12 live messages plus the current message are eligible; older context is removed until the payload fits. Responses are limited to 256 KiB.
 
@@ -48,7 +48,7 @@ The screen distinguishes **reserved allowance** from **estimated usage cost**. T
 
 34 automated tests passed on macOS with Python 3.9.6: 16 existing local tests plus 18 provider and HTTP integration tests. All live-provider tests inject synthetic credentials and responses; none call OpenAI. Coverage includes concurrent allowance exhaustion, credential exclusion from disk/state/errors, no-key/no-budget failures, bounded requests, malformed responses, provider drift, context isolation, cancelled/reset/disconnected late replies, invalid reconnect and prevention of duplicated paid attempts.
 
-JavaScript syntax passed. The updated Connection screen was inspected in the actual browser and showed the configured allowance. No real credential or paid request was used during these checks. Windows, production hosting, remote access, voice and Unreal remain unverified.
+JavaScript syntax passed. The updated Connection screen was inspected in the actual browser and showed the configured allowance. The automated suite used no real credential or paid request. Subsequent live browser verification passed: a real reply followed the saved persona; a second reply correctly recalled a two-word synthetic test phrase; both replies persisted after page reload; Connection showed the verified state. Two API attempts reported 438 input tokens and 35 output tokens, with an estimated combined cost of $0.000131. The conservative ledger reserved $0.04, leaving $0.96 of the $1 test allowance. These are usage estimates, not a billing receipt. The key was never read by Codex or saved in the source. Windows, production hosting, remote access, voice and Unreal remain unverified.
 
 Run checks:
 

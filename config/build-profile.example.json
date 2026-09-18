@@ -78,7 +78,8 @@
     "max_initial_test_allowance_usd": 1,
     "auto_retry": false,
     "key_storage": "process_memory_only",
-    "live_verified": false,
-    "guide": "docs/10-live-text-connection.md"
+    "live_verified": true,
+    "guide": "docs/10-live-text-connection.md",
+    "verified_date": "2026-09-18"
   }
 }
