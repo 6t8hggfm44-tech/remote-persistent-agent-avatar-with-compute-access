@@ -83,4 +83,4 @@ if errors:
     raise SystemExit('\n'.join(errors))
 print(f'PASS: {len(json_files)} JSON files, {len(tasks)} acyclic tasks, '
       'entry points, Markdown local links/fences and all file hashes.')
-print('Pack checks do not run application tests. See docs/09-local-prototype.md for runtime verification.')
+print('Pack checks do not run application tests. See docs/10-live-text-connection.md for runtime verification.')

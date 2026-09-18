@@ -82,8 +82,12 @@ class LocalAppTests(unittest.TestCase):
     def request(self, method, path, payload=OMIT, *, token=OMIT,
                 origin=OMIT, host=None, content_type="application/json", raw=None):
         if method == "POST" and path == "/api/messages" and isinstance(payload, dict):
-            if "conversation_epoch" not in payload:
-                payload = {**payload, "conversation_epoch": self.state()["conversation_epoch"]}
+            state = self.state()
+            payload = {
+                "conversation_epoch": state["conversation_epoch"],
+                "provider": "openai" if state["connection"]["connected"] else "preview",
+                **payload,
+            }
         headers = {"Host": host or f"127.0.0.1:{self.port}"}
         if method != "GET":
             value = self.token if token is OMIT else token

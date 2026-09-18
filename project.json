@@ -5,13 +5,14 @@
   "repository": "6t8hggfm44-tech/remote-persistent-agent-avatar-with-compute-access",
   "visibility_at_preparation": "public",
   "delivery_type": "execution_plan_and_local_prototype",
-  "implementation_status": "local_persona_prototype_verified",
+  "implementation_status": "local_ai_connection_ready_awaiting_user_key",
   "current_scope": [
     "local_persona_app",
     "simulated_conversation",
     "persistent_local_tasks",
     "tests",
-    "source_repository_persistence"
+    "source_repository_persistence",
+    "bounded_openai_text_connection"
   ],
   "not_authorized_by_this_request": [
     "purchases",
@@ -56,6 +57,7 @@
     "agent/START_HERE.md",
     "project.json",
     "agent/state.json",
+    "docs/10-live-text-connection.md",
     "docs/09-local-prototype.md",
     "docs/01-system-design.md",
     "docs/06-permissions-and-handoff.md",
@@ -86,10 +88,11 @@
   "runtime": {
     "entrypoint": "app/server.py",
     "start": "python3 -B -m app.server --port 8765",
-    "guide": "docs/09-local-prototype.md",
+    "guide": "docs/10-live-text-connection.md",
     "dependencies": "Python standard library only",
-    "model": "scripted_mock",
+    "model": "gpt-5.6-luna optional; preview default",
     "database": "SQLite local only",
-    "EA": "deferred_by_user"
+    "EA": "deferred_by_user",
+    "credential_storage": "process_memory_only"
   }
 }

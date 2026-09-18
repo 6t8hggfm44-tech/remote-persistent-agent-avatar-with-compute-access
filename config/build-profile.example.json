@@ -64,5 +64,21 @@
     "version": "0.1.0",
     "EA_connected": false,
     "live_AI_connected": false
+  },
+  "live_text_profile": {
+    "model": "gpt-5.6-luna",
+    "endpoint": "https://api.openai.com/v1/responses",
+    "reasoning": "none",
+    "store": false,
+    "service_tier": "default",
+    "max_output_tokens": 1000,
+    "max_payload_bytes": 30000,
+    "attempt_reservation_usd": 0.02,
+    "new_data_directory_allowance_usd": 0,
+    "max_initial_test_allowance_usd": 1,
+    "auto_retry": false,
+    "key_storage": "process_memory_only",
+    "live_verified": false,
+    "guide": "docs/10-live-text-connection.md"
   }
 }

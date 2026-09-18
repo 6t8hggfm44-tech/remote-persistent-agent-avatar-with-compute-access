@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-09-17",
+  "as_of": "2026-09-18",
   "planning_status": "complete",
-  "implementation_status": "local_persona_prototype_verified",
-  "runtime_test_status": "16_backend_tests_passed_and_browser_flow_verified",
+  "implementation_status": "local_ai_connection_ready_awaiting_user_key",
+  "runtime_test_status": "34_offline_and_mocked_http_tests_passed",
   "ea_active": false,
   "ea_initialization_completed": false,
   "deployed_endpoint": null,
@@ -11,25 +11,29 @@
   "approved_spending": null,
   "enabled_schedules": [],
   "runtime_grants": [
-    "local_prototype_implementation"
+    "local_prototype_implementation",
+    "bounded_live_text_implementation"
   ],
   "completed_build_tasks": [
     "P0",
     "P1",
     "P2",
-    "P3"
+    "P3",
+    "P4"
   ],
-  "last_completed_work": "Local persona editor, scripted conversations, durable mock jobs and browser verification",
-  "next_action": "Check API billing readiness with Pete; configure secure credentials and a usage allowance before adding/testing live AI.",
+  "last_completed_work": "Memory-only API connection, bounded text adapter and persistent conservative allowance; tested without paid calls",
+  "next_action": "User enters key directly in Connection; execute harmless live text test within current authorized allowance",
   "recommended_first_milestone": [],
   "parallel_preparation": [],
   "open_decisions": [
-    "API billing readiness (user unsure)",
-    "API usage budget and secure credential setup",
-    "later GPU workstation and avatar solver"
+    "User credential entry",
+    "Live account/model verification",
+    "Later GPU workstation and avatar solver"
   ],
   "state_privacy": "public_sanitized_summary; actual run records stay private",
   "restart_rule": "Infrastructure restart never activates EA or revives ended/revoked scope; resume only still-valid authorized work after required checks.",
   "local_preview_url": "http://127.0.0.1:8765",
-  "ea_integration": "deferred_by_user"
+  "ea_integration": "deferred_by_user",
+  "live_api_verified": false,
+  "live_api_calls_made": 0
 }

@@ -97,12 +97,17 @@ class Store:
                     content TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     task_id TEXT NOT NULL,
+                    provider TEXT NOT NULL DEFAULT 'preview' CHECK(provider IN ('preview','openai')),
                     UNIQUE(task_id, role)
                 );
                 CREATE INDEX IF NOT EXISTS pending_tasks ON tasks(status, created_at);
             """)
             connection.execute("INSERT OR IGNORE INTO settings VALUES ('persona', ?)", (json.dumps(DEFAULT_PERSONA),))
             connection.execute("INSERT OR IGNORE INTO settings VALUES ('conversation_epoch', '0')")
+        with self._connection(write=True) as connection:
+            columns = {row["name"] for row in connection.execute("PRAGMA table_info(messages)")}
+            if "provider" not in columns:
+                connection.execute("ALTER TABLE messages ADD COLUMN provider TEXT NOT NULL DEFAULT 'preview' CHECK(provider IN ('preview','openai'))")
         os.chmod(self.path, 0o600)
 
     @contextmanager
@@ -130,7 +135,9 @@ class Store:
 
     @staticmethod
     def _task(row):
-        return {key: row[key] for key in ("id", "title", "status", "kind", "created_at", "result")}
+        task = {key: row[key] for key in ("id", "title", "status", "kind", "created_at", "result")}
+        task["provider"] = json.loads(row["payload"]).get("provider", "preview")
+        return task
 
     def health(self):
         with self._connection() as connection:
@@ -142,7 +149,7 @@ class Store:
             persona = json.loads(self._setting(connection, "persona"))
             conversation_epoch = int(self._setting(connection, "conversation_epoch"))
             messages = [dict(row) for row in connection.execute(
-                "SELECT id, role, content, created_at FROM messages ORDER BY sequence")]
+                "SELECT id, role, content, created_at, provider FROM messages ORDER BY sequence")]
             tasks = [self._task(row) for row in connection.execute(
                 "SELECT * FROM tasks ORDER BY created_at DESC, rowid DESC")]
             connection.execute("COMMIT")
@@ -161,8 +168,10 @@ class Store:
             connection.execute("UPDATE settings SET value = ? WHERE key = 'persona'", (json.dumps(persona),))
         return persona
 
-    def enqueue_message(self, content, request_id, conversation_epoch=None):
+    def enqueue_message(self, content, request_id, conversation_epoch=None, provider="preview", live_can_send=True):
         content = validate_text(content, "Message", 4000)
+        if provider not in ("preview", "openai"):
+            raise StoreError("Unsupported reply provider.")
         content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
         if not isinstance(request_id, str) or not re.fullmatch(r"[A-Za-z0-9_-]{8,128}", request_id):
             raise StoreError("request_id must be 8–128 letters, numbers, underscores, or hyphens.")
@@ -173,10 +182,18 @@ class Store:
                 old_hash = old_payload.get("content_hash") or hashlib.sha256(old_payload["content"].encode("utf-8")).hexdigest()
                 if old_hash != content_hash:
                     raise StoreError("This request_id was already used for a different message.", 409)
+                if old_payload.get("provider", "preview") != provider:
+                    raise StoreError("This request_id was already used with a different reply provider.", 409)
                 return previous["id"]
             current_epoch = int(self._setting(connection, "conversation_epoch"))
             if conversation_epoch is not None and (type(conversation_epoch) is not int or conversation_epoch != current_epoch):
                 raise StoreError("This conversation changed. Refresh and resend your message if you still want to send it.", 409)
+            if provider == "openai":
+                if not live_can_send:
+                    raise StoreError("The local API test allowance cannot cover another reply. Increase the authorized allowance before continuing.", 403)
+                pending = connection.execute("SELECT payload FROM tasks WHERE kind='mock_reply' AND status IN ('queued','running')")
+                if any(json.loads(row["payload"]).get("provider", "preview") == "openai" for row in pending):
+                    raise StoreError("Wait for the current AI reply to finish, or cancel it before sending another message.", 409)
             task_id = str(uuid.uuid4())
             now = timestamp()
             payload = {
@@ -184,14 +201,15 @@ class Store:
                 "content_hash": content_hash,
                 "persona": json.loads(self._setting(connection, "persona")),
                 "epoch": self._setting(connection, "conversation_epoch"),
+                "provider": provider,
             }
             connection.execute(
                 "INSERT INTO tasks (id,title,status,kind,created_at,payload,request_id) VALUES (?,?,'queued','mock_reply',?,?,?)",
-                (task_id, "Preview reply", now, json.dumps(payload), request_id),
+                (task_id, "AI reply" if provider == "openai" else "Preview reply", now, json.dumps(payload), request_id),
             )
             connection.execute(
-                "INSERT INTO messages (id,role,content,created_at,task_id) VALUES (?,'user',?,?,?)",
-                (str(uuid.uuid4()), content, now, task_id),
+                "INSERT INTO messages (id,role,content,created_at,task_id,provider) VALUES (?,'user',?,?,?,?)",
+                (str(uuid.uuid4()), content, now, task_id, provider),
             )
             return task_id
 
@@ -226,14 +244,66 @@ class Store:
             for row in connection.execute("SELECT id,payload FROM tasks WHERE kind='mock_reply'").fetchall():
                 old_payload = json.loads(row["payload"])
                 content_hash = old_payload.get("content_hash") or hashlib.sha256(old_payload.get("content", "").encode("utf-8")).hexdigest()
-                connection.execute("UPDATE tasks SET payload=?,result=NULL WHERE id=?", (json.dumps({"content_hash": content_hash}), row["id"]))
+                redacted = {"content_hash": content_hash, "provider": old_payload.get("provider", "preview")}
+                connection.execute("UPDATE tasks SET payload=?,result=NULL WHERE id=?", (json.dumps(redacted), row["id"]))
             epoch = int(self._setting(connection, "conversation_epoch")) + 1
             connection.execute("UPDATE settings SET value=? WHERE key='conversation_epoch'", (str(epoch),))
 
     def recover_pending(self):
-        """Called once before starting a worker; invalidate previous claims."""
+        """Recover local work; never automatically repeat a possibly paid call."""
         with self._connection(write=True) as connection:
-            return connection.execute("UPDATE tasks SET status='queued',claim_token=NULL WHERE status='running'").rowcount
+            changed = 0
+            for row in connection.execute("SELECT id,status,payload FROM tasks WHERE status IN ('queued','running')").fetchall():
+                if json.loads(row["payload"]).get("provider", "preview") == "openai":
+                    connection.execute("UPDATE tasks SET status='failed',claim_token=NULL,result=? WHERE id=?", (
+                        "Interrupted AI request was not retried; it may have been billed.", row["id"]))
+                    changed += 1
+                elif row["status"] == "running":
+                    connection.execute("UPDATE tasks SET status='queued',claim_token=NULL WHERE id=?", (row["id"],))
+                    changed += 1
+            return changed
+
+    def cancel_live_tasks(self):
+        """Fence queued/in-flight live replies when the connection is removed."""
+        with self._connection(write=True) as connection:
+            cancelled = 0
+            for row in connection.execute("SELECT id,payload FROM tasks WHERE status IN ('queued','running')").fetchall():
+                if json.loads(row["payload"]).get("provider", "preview") == "openai":
+                    connection.execute("UPDATE tasks SET status='cancelled',claim_token=NULL WHERE id=?", (row["id"],))
+                    cancelled += 1
+            return cancelled
+
+    def is_task_active(self, task):
+        with self._connection() as connection:
+            row = connection.execute("SELECT status,claim_token,payload FROM tasks WHERE id=?", (task["id"],)).fetchone()
+            if row is None or row["status"] != "running" or row["claim_token"] != task["claim_token"]:
+                return False
+            payload = json.loads(row["payload"])
+            return "epoch" not in payload or payload["epoch"] == self._setting(connection, "conversation_epoch")
+
+    def get_reply_context(self, task):
+        """Return up to 12 prior live messages, followed by this task's user turn.
+
+        Sequence bounds prevent later messages entering a queued request. The
+        current conversation epoch and claim must still be active. Scripted
+        preview messages are never included in a paid model request.
+        """
+        with self._connection() as connection:
+            connection.execute("BEGIN")
+            row = connection.execute("SELECT status,claim_token,payload FROM tasks WHERE id=?", (task["id"],)).fetchone()
+            if row is None or row["status"] != "running" or row["claim_token"] != task["claim_token"]:
+                raise StoreError("This AI request is no longer active.", 409)
+            payload = json.loads(row["payload"])
+            if payload.get("epoch") != self._setting(connection, "conversation_epoch"):
+                raise StoreError("This conversation changed before the AI request started.", 409)
+            current = connection.execute("SELECT sequence,role,content,provider FROM messages WHERE task_id=? AND role='user' AND provider='openai'", (task["id"],)).fetchone()
+            if current is None:
+                raise StoreError("This AI request has no current user message.", 409)
+            earlier = connection.execute("SELECT role,content,provider FROM messages WHERE provider='openai' AND sequence<? ORDER BY sequence DESC LIMIT 12", (current["sequence"],)).fetchall()
+            history = [dict(message) for message in reversed(earlier)]
+            history.append({key: current[key] for key in ("role", "content", "provider")})
+            connection.execute("COMMIT")
+            return history
 
     def claim_next_task(self):
         with self._connection(write=True) as connection:
@@ -258,15 +328,15 @@ class Store:
                     connection.execute("UPDATE tasks SET status='cancelled',claim_token=NULL WHERE id=?", (task["id"],))
                     return False
                 connection.execute(
-                    "INSERT INTO messages (id,role,content,created_at,task_id) VALUES (?,'assistant',?,?,?)",
-                    (str(uuid.uuid4()), result, timestamp(), task["id"]),
+                    "INSERT INTO messages (id,role,content,created_at,task_id,provider) VALUES (?,'assistant',?,?,?,?)",
+                    (str(uuid.uuid4()), result, timestamp(), task["id"], payload.get("provider", "preview")),
                 )
             connection.execute("UPDATE tasks SET status='completed',result=?,claim_token=NULL WHERE id=?", (result, task["id"]))
             return True
 
-    def fail_task(self, task):
+    def fail_task(self, task, message="The local task could not finish."):
         with self._connection(write=True) as connection:
             connection.execute(
-                "UPDATE tasks SET status='failed',result='The local preview task could not finish.',claim_token=NULL WHERE id=? AND status='running' AND claim_token=?",
-                (task["id"], task["claim_token"]),
+                "UPDATE tasks SET status='failed',result=?,claim_token=NULL WHERE id=? AND status='running' AND claim_token=?",
+                (message, task["id"], task["claim_token"]),
             )

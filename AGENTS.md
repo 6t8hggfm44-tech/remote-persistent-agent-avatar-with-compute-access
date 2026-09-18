@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-Pete authorized starting implementation and explicitly set EA integration aside. Presence 0.1 is a local persona/conversation/task prototype, with scripted responses only. Do not read or activate EA controls for ordinary prototype work. Live AI, voice, Unreal, cloud deployment and purchases require their corresponding next-step setup/scope. See `docs/09-local-prototype.md`.
+Pete authorized starting implementation and explicitly set EA integration aside. Presence 0.2 implements local persona/conversation/tasks and an optional bounded OpenAI text adapter. Mocked tests pass; real API verification requires user credential entry and current spending authorization. Do not read or activate EA controls for ordinary prototype work. Voice, Unreal, cloud deployment and purchases require their corresponding next-step setup/scope. See `docs/10-live-text-connection.md`.
 
 ## Scope and authority
 

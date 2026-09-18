@@ -1,3 +1,3 @@
-"""Local-only agent preview. No model, remote compute, or EA connection."""
+"""Local persona app with optional AI text; no remote compute or EA connection."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

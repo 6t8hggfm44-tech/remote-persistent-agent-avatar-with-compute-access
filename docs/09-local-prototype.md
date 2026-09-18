@@ -1,5 +1,7 @@
 # Presence 0.1 — local persona prototype
 
+This records the completed 0.1 milestone. [Presence 0.2](10-live-text-connection.md) adds optional live text setup and supersedes the connection limitations below when a key and authorized allowance are present.
+
 Built after Pete authorized implementation and explicitly set Executive Agent integration aside. This supersedes the initial planning-only scope for this milestone. It does not activate EA, load its governance repository, or authorize spending.
 
 ## What works

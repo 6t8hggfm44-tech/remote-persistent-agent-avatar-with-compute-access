@@ -1,8 +1,14 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const emptyConversation = $('#conversation-empty').cloneNode(true);
-const model = { state: null, token: '', view: 'conversation', online: false, dirtyPersona: false, submitting: false, savingPersona: false, creatingTask: false, resetting: false, request: null, messageSignature: '', taskSignature: '', toastTimer: null };
-const titles = { conversation: 'Conversation', persona: 'Persona', activity: 'Activity' };
+const model = { state: null, token: '', view: 'conversation', online: false, dirtyPersona: false, submitting: false, savingPersona: false, creatingTask: false, resetting: false, connecting: false, disconnecting: false, request: null, messageSignature: '', taskSignature: '', toastTimer: null };
+const titles = { conversation: 'Conversation', persona: 'Persona', activity: 'Activity', connection: 'Connection' };
+const realTask = (task) => task.provider === 'openai';
+const replyTask = (task) => task.kind !== 'draft';
+const connected = () => Boolean(model.state?.connection?.connected);
+const livePending = () => Boolean(model.state?.tasks.some(task => realTask(task) && pending(task)));
+const canSend = () => model.online && !model.submitting && !model.resetting && !model.connecting && !model.disconnecting && !livePending() && (!connected() || model.state.connection.can_send);
+const money = (value, precise = false) => Number.isFinite(value) ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: precise ? 4 : 2 }).format(value) : '—';
 const pending = (task) => ['queued', 'running'].includes(task.status);
 const titleCase = (text = '') => text.charAt(0).toUpperCase() + text.slice(1);
 
@@ -28,7 +34,11 @@ function setOnline(online) {
   model.online = online;
   $('#offline-banner').hidden = online;
   $('#connection-label').textContent = online ? 'Connected locally' : 'Reconnecting';
-  $('#send-message').disabled = !online || model.submitting || model.resetting;
+  $('#send-message').disabled = !canSend();
+  $$('.suggestions button').forEach(button => { button.disabled = !canSend(); });
+  $('#connect-ai').disabled = !online || model.connecting || model.disconnecting;
+  $('#disconnect-ai').disabled = !online || model.connecting || model.disconnecting;
+  $('#api-key').disabled = !online || model.connecting || model.disconnecting;
   $('#reset-open').disabled = !online || model.submitting || model.resetting;
   $('#persona-save').disabled = !online || model.savingPersona;
   $('#task-form button').disabled = !online || model.creatingTask;
@@ -90,7 +100,10 @@ function renderMessages(state) {
     const label = document.createElement('div');
     label.className = 'message-label';
     label.textContent = item.role === 'user' ? 'You' : 'Agent';
-    if (item.role !== 'user') { const badge = document.createElement('span'); badge.textContent = 'Preview'; label.append(badge); }
+    const badge = document.createElement('span');
+    badge.textContent = item.provider === 'openai' ? 'Live AI' : 'Preview';
+    badge.className = item.provider === 'openai' ? 'live-message-badge' : 'preview-message-badge';
+    label.append(badge);
     const content = document.createElement('p');
     content.className = 'message-content';
     content.textContent = item.content;
@@ -105,9 +118,15 @@ function renderTasks(state) {
   const active = state.tasks.filter(pending);
   $('#task-count').hidden = active.length === 0;
   $('#task-count').textContent = active.length;
-  const replyActive = active.some(task => task.kind === 'mock_reply');
+  const replyActive = active.some(replyTask);
+  const realReplyActive = active.some(task => realTask(task) && replyTask(task));
   $('#reply-progress').hidden = !replyActive;
-  $('#presence-state').textContent = replyActive ? 'Preparing a preview reply' : 'Ready to preview';
+  $('#reply-progress-copy').textContent = realReplyActive ? 'Your AI is thinking…' : 'Preparing a preview reply…';
+  $('#presence-state').textContent = replyActive ? (realReplyActive ? 'Thinking with your persona' : 'Preparing a preview reply') : connected() ? (state.connection.can_send ? 'Ready for a conversation' : 'Test allowance unavailable') : 'Ready to preview';
+  const latestReply = state.tasks.find(replyTask);
+  const failure = state.messages.length > 0 && latestReply && realTask(latestReply) && latestReply.status === 'failed';
+  $('#reply-error').hidden = !failure;
+  $('#reply-error').textContent = failure ? (latestReply.result || 'The real AI reply could not finish. See Activity for details.') : '';
   const signature = JSON.stringify(state.tasks);
   if (signature === model.taskSignature) return;
   model.taskSignature = signature;
@@ -123,11 +142,11 @@ function renderTasks(state) {
     const heading = document.createElement('h3'); heading.textContent = task.title;
     const kind = document.createElement('p'); kind.className = 'task-kind';
     const date = new Date(task.created_at);
-    kind.textContent = `${task.kind === 'draft' ? 'Sample task' : 'Preview conversation'} · ${Number.isNaN(date.getTime()) ? '' : date.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`;
+    kind.textContent = `${task.kind === 'draft' ? 'Sample task' : realTask(task) ? 'Real AI conversation' : 'Preview conversation'} · ${Number.isNaN(date.getTime()) ? '' : date.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`;
     identity.append(heading, kind);
     const status = document.createElement('span'); status.className = `task-status ${task.status}`; status.textContent = titleCase(task.status);
     top.append(identity, status); card.append(top);
-    if (task.result && task.kind === 'draft') { const result = document.createElement('p'); result.className = 'task-result'; result.textContent = task.result; card.append(result); }
+    if (task.result && (task.kind === 'draft' || task.status === 'failed')) { const result = document.createElement('p'); result.className = 'task-result'; result.textContent = task.result; card.append(result); }
     if (pending(task)) {
       const actions = document.createElement('div'); actions.className = 'task-actions';
       const cancel = document.createElement('button'); cancel.className = 'text-button'; cancel.textContent = 'Cancel task'; cancel.dataset.cancelTask = task.id; actions.append(cancel); card.append(actions);
@@ -135,6 +154,40 @@ function renderTasks(state) {
     fragment.append(card);
   }
   list.replaceChildren(fragment);
+}
+
+function renderConnection(state) {
+  const connection = state.connection || {};
+  const live = Boolean(connection.connected);
+  const status = live ? connection.verified ? 'Connected' : 'Key loaded' : 'Not connected';
+  $('#mode-label').textContent = live ? 'Live AI mode' : 'Preview mode';
+  $('#mode-badge').classList.toggle('live-mode', live);
+  $('#mode-notice').classList.toggle('live-notice', live);
+  $('#mode-notice-copy').textContent = live
+    ? connection.verified ? 'Real AI replies use your persona and API credit. Voice and the 3D avatar remain off.' : 'Your key is loaded. Send a message to test real AI replies using your approved allowance.'
+    : 'Preview mode is active. Replies are simulated. Connect OpenAI for real text conversations.';
+  $('#connect-cta').hidden = live;
+  $('#ai-connection-summary').textContent = status;
+  $('#provider-status').textContent = status;
+  $('#provider-status').classList.toggle('is-connected', live);
+  $('#connection-ready').hidden = !live;
+  $('#connection-form').hidden = live;
+  if (live) $('#api-key').value = '';
+  $('#connection-ready-title').textContent = connection.verified ? 'Your AI is connected.' : 'Key loaded. Ready to test.';
+  $('#connection-ready-copy').textContent = connection.verified
+    ? 'Real replies are working. Your key stays in memory until you disconnect or restart Presence.'
+    : 'No paid call has been made to check this key. Send a message in Conversation to verify the connection.';
+  $('#conversation-heading').textContent = live ? 'Your conversation' : 'Try a preview conversation';
+  $('#conversation-subtitle').textContent = live ? 'Real text replies, guided by your saved persona.' : 'Scripted replies to explore the interface.';
+  $('#composer-note').textContent = live
+    ? livePending() ? 'Waiting for your AI’s reply…' : connection.can_send ? 'Live AI · Uses API credit · Enter to send' : 'Test allowance unavailable · See Connection'
+    : 'Simulated replies · No API charge · Enter to send';
+  $('#footer-status').textContent = live ? 'Saved locally · Real replies powered by OpenAI' : 'Local workspace · Simulated preview replies';
+  $('#budget-limit').textContent = money(connection.budget_limit_usd);
+  $('#budget-reserved').textContent = money(connection.reserved_usd, true);
+  $('#budget-estimated').textContent = money(connection.estimated_cost_usd, true);
+  $('#budget-remaining').textContent = money(connection.remaining_usd, true);
+  $('#budget-status').textContent = !Number.isFinite(connection.budget_limit_usd) ? 'Waiting for connection details…' : livePending() ? 'A reply is in progress. Its allowance is reserved.' : live && !connection.can_send ? 'No new real replies can start with the current test allowance.' : 'Only messages you send start a paid reply.';
 }
 
 function renderState(state) {
@@ -145,6 +198,7 @@ function renderState(state) {
   $('#tone-summary').textContent = titleCase(state.persona.tone);
   $('#length-summary').textContent = `${titleCase(state.persona.response_length)} replies`;
   if (!model.dirtyPersona && !$('#persona-form').contains(document.activeElement)) fillPersona(state.persona);
+  renderConnection(state);
   renderMessages(state);
   renderTasks(state);
 }
@@ -161,8 +215,8 @@ async function refresh() {
 async function submitMessage() {
   const input = $('#message-input');
   const content = input.value.trim();
-  if (!content || model.submitting || model.resetting || !model.online) return;
-  if (!model.request || model.request.content !== content) model.request = { content, request_id: crypto.randomUUID(), conversation_epoch: model.state.conversation_epoch };
+  if (!content || !canSend()) return;
+  if (!model.request || model.request.content !== content) model.request = { content, request_id: crypto.randomUUID(), conversation_epoch: model.state.conversation_epoch, provider: model.state.mode === 'live' ? 'openai' : 'preview' };
   model.submitting = true; setOnline(model.online);
   try {
     await api('/api/messages', model.request);
@@ -184,6 +238,40 @@ document.addEventListener('click', async event => {
     try { const result = await api(`/api/tasks/${encodeURIComponent(cancel.dataset.cancelTask)}/cancel`, {}); toast(result.task.status === 'cancelled' ? 'Task cancelled.' : 'This task has already finished.'); await refresh(); }
     catch (error) { toast(error.message, true); cancel.disabled = false; }
   }
+});
+
+$('#connection-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!model.online || model.connecting || model.disconnecting) return;
+  const input = $('#api-key');
+  const key = input.value.trim();
+  // Never retain a credential in the field or browser storage after submission.
+  input.value = '';
+  if (!key) return;
+  model.connecting = true;
+  $('#connection-save-status').textContent = 'Loading your key for this session…';
+  setOnline(model.online);
+  try {
+    await api('/api/connection', { api_key: key });
+    $('#connection-save-status').textContent = 'Key loaded. No paid call was made.';
+    await refresh();
+    toast('Key loaded. Send a message to test your AI.');
+  } catch (error) {
+    $('#connection-save-status').textContent = error.message;
+    toast(error.message, true);
+  } finally { model.connecting = false; setOnline(model.online); }
+});
+$('#disconnect-ai').addEventListener('click', async () => {
+  if (!model.online || model.connecting || model.disconnecting) return;
+  model.disconnecting = true;
+  setOnline(model.online);
+  try {
+    await api('/api/connection/disconnect', {});
+    $('#connection-save-status').textContent = 'Disconnected. Enter a key to reconnect.';
+    await refresh();
+    toast('Disconnected. Preview mode is active. In-progress AI calls may still be billed.');
+  } catch (error) { toast(error.message, true); }
+  finally { model.disconnecting = false; setOnline(model.online); }
 });
 
 $('#message-form').addEventListener('submit', event => { event.preventDefault(); submitMessage(); });
@@ -215,7 +303,7 @@ $('#task-form').addEventListener('submit', async event => {
 });
 $('#stop-reply').addEventListener('click', async () => {
   const button = $('#stop-reply'); button.disabled = true;
-  try { for (const task of model.state.tasks.filter(task => task.kind === 'mock_reply' && pending(task))) await api(`/api/tasks/${encodeURIComponent(task.id)}/cancel`, {}); await refresh(); toast('Pending replies stopped.'); }
+  try { for (const task of model.state.tasks.filter(task => replyTask(task) && pending(task))) await api(`/api/tasks/${encodeURIComponent(task.id)}/cancel`, {}); await refresh(); toast('Replies stopped. A real reply already in progress may still be billed.'); }
   catch (error) { toast(error.message, true); }
   finally { button.disabled = false; }
 });

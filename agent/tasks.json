@@ -810,6 +810,55 @@
         "docs/09-local-prototype.md"
       ],
       "on_block": "Report the actual missing capability."
+    },
+    {
+      "project": "local_prototype",
+      "optional": false,
+      "workflow": "docs/10-live-text-connection.md",
+      "test_ids": [],
+      "on_block": "Complete independent work; request only missing user input. Never request secrets in chat.",
+      "id": "P4",
+      "title": "Build bounded OpenAI text adapter and connection interface",
+      "status": "verified",
+      "depends_on": [
+        "P3"
+      ],
+      "requires": [
+        "local_implementation_authorized"
+      ],
+      "section": "Implementation and validation",
+      "deliverable": "Memory-only credentials, text adapter, durable allowance and Connection view",
+      "acceptance": [
+        "34 offline/mocked tests pass; no secret persisted; no automatic paid retry"
+      ],
+      "evidence": [
+        "docs/10-live-text-connection.md"
+      ]
+    },
+    {
+      "project": "local_prototype",
+      "optional": false,
+      "workflow": "docs/10-live-text-connection.md",
+      "test_ids": [],
+      "on_block": "Complete independent work; request only missing user input. Never request secrets in chat.",
+      "id": "P5",
+      "title": "Verify an authorized live text conversation",
+      "status": "planned",
+      "depends_on": [
+        "P4"
+      ],
+      "requires": [
+        "user_enters_api_key_locally",
+        "explicit_test_spending_authorization"
+      ],
+      "section": "Connect and test",
+      "deliverable": "Verified real reply and follow-up context with sanitized usage evidence",
+      "acceptance": [
+        "Real account/model call succeeds",
+        "Saved persona and recent context used",
+        "Reported usage recorded within authorized allowance"
+      ],
+      "evidence": []
     }
   ],
   "status_rule": "verified requires actual evidence; requirements are not grants",

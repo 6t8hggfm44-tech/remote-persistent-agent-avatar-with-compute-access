@@ -1,12 +1,12 @@
 # Remote persistent agent and avatar — build pack
 
-Prepared 2026-09-17. **Current status: Presence 0.1 local persona prototype implemented and tested. EA integration is on hold.**
+Prepared 2026-09-17; updated 2026-09-18. **Current status: Presence 0.2 adds an OpenAI text connection, verified with synthetic responses. Real API verification awaits user credential entry. EA integration is on hold.**
 
 Repository: [remote-persistent-agent-avatar-with-compute-access](https://github.com/6t8hggfm44-tech/remote-persistent-agent-avatar-with-compute-access).
 
 ## Open the working local prototype
 
-**Presence 0.1** lets you edit a persona, try explicitly simulated conversations, and create persistent sample tasks. It runs locally with Python 3.9+ and requires no paid services or third-party packages.
+**Presence 0.2** lets you edit a persona, use preview conversations and persistent sample tasks, and connect OpenAI for bounded text testing. It runs locally with Python 3.9+ and no third-party packages. Preview mode is free; real replies use separately authorized API credit.
 
 ```sh
 python3 -B -m app.server --port 8765
@@ -14,7 +14,7 @@ python3 -B -m app.server --port 8765
 
 Then open [http://127.0.0.1:8765](http://127.0.0.1:8765). On a Mac, `start.command` starts the same service. Keep it running while using the app. [Read the prototype guide, verified behavior and limitations](docs/09-local-prototype.md).
 
-The text responses are scripted previews. Live AI, voice, Unreal and EA are not connected. Conversations and persona settings stay in ignored local `runtime-data/`; they are excluded from Git and the downloadable source bundle.
+The app starts in scripted preview mode. The [live text connection guide](docs/10-live-text-connection.md) explains key entry, test allowance, data handling and verified boundaries. Voice, Unreal and EA remain disconnected. Conversations, persona settings and usage reservations stay in ignored local `runtime-data/`; credentials stay in server memory only. Private runtime data is excluded from Git and source bundles.
 
 The detailed roadmap below remains the plan for later stages. This local milestone deliberately uses SQLite and a dependency-free server before moving to the proposed production stack.
 
