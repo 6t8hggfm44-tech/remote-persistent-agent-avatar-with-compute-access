@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "as_of": "2026-09-18",
   "planning_status": "complete",
-  "implementation_status": "local_live_text_verified",
-  "runtime_test_status": "34_offline_mocked_tests_and_2_live_browser_tests_passed",
+  "implementation_status": "local_memory_and_source_context_verified",
+  "runtime_test_status": "55_offline_tests_passed; browser_library_and_mobile_layout_verified; no_new_paid_calls",
   "ea_active": false,
   "ea_initialization_completed": false,
   "deployed_endpoint": null,
@@ -12,7 +12,8 @@
   "enabled_schedules": [],
   "runtime_grants": [
     "local_prototype_implementation",
-    "bounded_live_text_implementation"
+    "bounded_live_text_implementation",
+    "explicit_memory_and_source_context_implementation"
   ],
   "completed_build_tasks": [
     "P0",
@@ -20,16 +21,18 @@
     "P2",
     "P3",
     "P4",
-    "P5"
+    "P5",
+    "P6",
+    "P7"
   ],
-  "last_completed_work": "Two live text calls verified saved persona, recent conversation recall and persistence after reload",
-  "next_action": "Pete can try the text persona; define the speech milestone before adding voice APIs or microphone access",
+  "last_completed_work": "Private saved memory, selected-document context with provenance, bounded local project reads, and source-history isolation; verified without paid API calls",
+  "next_action": "Reconnect the memory-only API key for source-grounded text use; next build named read-only repository refresh, then bounded tools/jobs, then speech",
   "recommended_first_milestone": [],
   "parallel_preparation": [],
   "open_decisions": [
-    "Preferred persona and voice",
-    "Speech milestone scope and usage allowance",
-    "Later GPU workstation and avatar solver"
+    "Runtime GitHub authentication and named repository scope for automatic refresh",
+    "Preferred distinctive persona",
+    "Later speech usage allowance and GPU/avatar setup"
   ],
   "state_privacy": "public_sanitized_summary; actual run records stay private",
   "restart_rule": "Infrastructure restart never activates EA or revives ended/revoked scope; resume only still-valid authorized work after required checks.",
@@ -43,5 +46,21 @@
     "estimated_cost_usd": 0.000131,
     "reserved_allowance_usd": 0.04,
     "billing_authority": "OpenAI dashboard"
+  },
+  "current_increment": {
+    "version": "0.3.0",
+    "automated_tests_passed": 55,
+    "new_paid_calls": 0,
+    "browser_verified": [
+      "library_memory_and_documents",
+      "saved_text_reader",
+      "exact_document_selection",
+      "390px_mobile_no_overflow",
+      "638px_normal_no_overflow"
+    ],
+    "private_state_preserved": true,
+    "runtime_key_requires_reconnection": true,
+    "source_mode": "local_snapshots; no automatic repository refresh",
+    "evidence": "docs/11-memory-and-repository-conversations.md"
   }
 }

@@ -5,14 +5,17 @@
   "repository": "6t8hggfm44-tech/remote-persistent-agent-avatar-with-compute-access",
   "visibility_at_preparation": "public",
   "delivery_type": "execution_plan_and_local_prototype",
-  "implementation_status": "local_live_text_verified",
+  "implementation_status": "local_memory_and_source_context_verified",
   "current_scope": [
     "local_persona_app",
     "simulated_conversation",
     "persistent_local_tasks",
     "tests",
     "source_repository_persistence",
-    "bounded_openai_text_connection"
+    "bounded_openai_text_connection",
+    "explicit_local_memory",
+    "selected_document_conversations",
+    "bounded_read_only_project_references"
   ],
   "not_authorized_by_this_request": [
     "purchases",
@@ -57,6 +60,7 @@
     "agent/START_HERE.md",
     "project.json",
     "agent/state.json",
+    "docs/11-memory-and-repository-conversations.md",
     "docs/10-live-text-connection.md",
     "docs/09-local-prototype.md",
     "docs/01-system-design.md",
@@ -88,12 +92,13 @@
   "runtime": {
     "entrypoint": "app/server.py",
     "start": "python3 -B -m app.server --port 8765",
-    "guide": "docs/10-live-text-connection.md",
+    "guide": "docs/11-memory-and-repository-conversations.md",
     "dependencies": "Python standard library only",
     "model": "gpt-5.6-luna optional; preview default",
     "database": "SQLite local only",
     "EA": "deferred_by_user",
     "credential_storage": "process_memory_only",
-    "live_verified": true
+    "live_verified": true,
+    "repository_access": "selected_document_snapshots_and_allowlisted_local_docs; no live GitHub adapter"
   }
 }

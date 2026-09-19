@@ -98,16 +98,29 @@ class Store:
                     created_at TEXT NOT NULL,
                     task_id TEXT NOT NULL,
                     provider TEXT NOT NULL DEFAULT 'preview' CHECK(provider IN ('preview','openai')),
+                    sources TEXT NOT NULL DEFAULT '[]',
                     UNIQUE(task_id, role)
+                );
+                CREATE TABLE IF NOT EXISTS memories (
+                    id TEXT PRIMARY KEY, title TEXT NOT NULL, content TEXT NOT NULL,
+                    created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS reports (
+                    id TEXT PRIMARY KEY, title TEXT NOT NULL, source_name TEXT NOT NULL,
+                    source_url TEXT NOT NULL, report_date TEXT NOT NULL,
+                    content TEXT NOT NULL, sha256 TEXT NOT NULL, created_at TEXT NOT NULL
                 );
                 CREATE INDEX IF NOT EXISTS pending_tasks ON tasks(status, created_at);
             """)
             connection.execute("INSERT OR IGNORE INTO settings VALUES ('persona', ?)", (json.dumps(DEFAULT_PERSONA),))
             connection.execute("INSERT OR IGNORE INTO settings VALUES ('conversation_epoch', '0')")
+            connection.execute("INSERT OR IGNORE INTO settings VALUES ('knowledge_epoch', '0')")
         with self._connection(write=True) as connection:
             columns = {row["name"] for row in connection.execute("PRAGMA table_info(messages)")}
             if "provider" not in columns:
                 connection.execute("ALTER TABLE messages ADD COLUMN provider TEXT NOT NULL DEFAULT 'preview' CHECK(provider IN ('preview','openai'))")
+            if "sources" not in columns:
+                connection.execute("ALTER TABLE messages ADD COLUMN sources TEXT NOT NULL DEFAULT '[]'")
         os.chmod(self.path, 0o600)
 
     @contextmanager
@@ -149,7 +162,9 @@ class Store:
             persona = json.loads(self._setting(connection, "persona"))
             conversation_epoch = int(self._setting(connection, "conversation_epoch"))
             messages = [dict(row) for row in connection.execute(
-                "SELECT id, role, content, created_at, provider FROM messages ORDER BY sequence")]
+                "SELECT id, role, content, created_at, provider, sources FROM messages ORDER BY sequence")]
+            for message in messages:
+                message["sources"] = json.loads(message["sources"])
             tasks = [self._task(row) for row in connection.execute(
                 "SELECT * FROM tasks ORDER BY created_at DESC, rowid DESC")]
             connection.execute("COMMIT")
@@ -168,10 +183,14 @@ class Store:
             connection.execute("UPDATE settings SET value = ? WHERE key = 'persona'", (json.dumps(persona),))
         return persona
 
-    def enqueue_message(self, content, request_id, conversation_epoch=None, provider="preview", live_can_send=True):
+    def enqueue_message(self, content, request_id, conversation_epoch=None, provider="preview", live_can_send=True, report_id=None, project_context=False):
         content = validate_text(content, "Message", 4000)
         if provider not in ("preview", "openai"):
             raise StoreError("Unsupported reply provider.")
+        if type(project_context) is not bool:
+            raise StoreError("project_context must be a boolean.")
+        if report_id is not None and (not isinstance(report_id, str) or not re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", report_id)):
+            raise StoreError("report_id must be a report identifier or null.")
         content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
         if not isinstance(request_id, str) or not re.fullmatch(r"[A-Za-z0-9_-]{8,128}", request_id):
             raise StoreError("request_id must be 8–128 letters, numbers, underscores, or hyphens.")
@@ -184,10 +203,14 @@ class Store:
                     raise StoreError("This request_id was already used for a different message.", 409)
                 if old_payload.get("provider", "preview") != provider:
                     raise StoreError("This request_id was already used with a different reply provider.", 409)
+                if old_payload.get("report_id") != report_id or old_payload.get("project_context", False) != project_context:
+                    raise StoreError("This request_id was already used with different reference choices.", 409)
                 return previous["id"]
             current_epoch = int(self._setting(connection, "conversation_epoch"))
             if conversation_epoch is not None and (type(conversation_epoch) is not int or conversation_epoch != current_epoch):
                 raise StoreError("This conversation changed. Refresh and resend your message if you still want to send it.", 409)
+            if report_id is not None and connection.execute("SELECT 1 FROM reports WHERE id=?", (report_id,)).fetchone() is None:
+                raise StoreError("The selected report is no longer available. Choose another report.", 409)
             if provider == "openai":
                 if not live_can_send:
                     raise StoreError("The local API test allowance cannot cover another reply. Increase the authorized allowance before continuing.", 403)
@@ -202,6 +225,9 @@ class Store:
                 "persona": json.loads(self._setting(connection, "persona")),
                 "epoch": self._setting(connection, "conversation_epoch"),
                 "provider": provider,
+                "report_id": report_id,
+                "project_context": project_context,
+                "knowledge_epoch": self._setting(connection, "knowledge_epoch"),
             }
             connection.execute(
                 "INSERT INTO tasks (id,title,status,kind,created_at,payload,request_id) VALUES (?,?,'queued','mock_reply',?,?,?)",
@@ -244,7 +270,7 @@ class Store:
             for row in connection.execute("SELECT id,payload FROM tasks WHERE kind='mock_reply'").fetchall():
                 old_payload = json.loads(row["payload"])
                 content_hash = old_payload.get("content_hash") or hashlib.sha256(old_payload.get("content", "").encode("utf-8")).hexdigest()
-                redacted = {"content_hash": content_hash, "provider": old_payload.get("provider", "preview")}
+                redacted = {"content_hash": content_hash, "provider": old_payload.get("provider", "preview"), "report_id": old_payload.get("report_id"), "project_context": old_payload.get("project_context", False)}
                 connection.execute("UPDATE tasks SET payload=?,result=NULL WHERE id=?", (json.dumps(redacted), row["id"]))
             epoch = int(self._setting(connection, "conversation_epoch")) + 1
             connection.execute("UPDATE settings SET value=? WHERE key='conversation_epoch'", (str(epoch),))
@@ -279,7 +305,30 @@ class Store:
             if row is None or row["status"] != "running" or row["claim_token"] != task["claim_token"]:
                 return False
             payload = json.loads(row["payload"])
-            return "epoch" not in payload or payload["epoch"] == self._setting(connection, "conversation_epoch")
+            if "epoch" in payload and payload["epoch"] != self._setting(connection, "conversation_epoch"):
+                return False
+            return payload.get("provider", "preview") != "openai" or str(payload.get("knowledge_epoch", "0")) == self._setting(connection, "knowledge_epoch")
+
+    def record_sources(self, task, sources):
+        """Persist only provenance metadata for a still-valid pending reply."""
+        allowed = {"citation", "kind", "id", "title", "source_name", "source_url", "report_date", "sha256", "created_at", "updated_at", "path", "line_start", "line_end", "truncated", "partial_line"}
+        if not isinstance(sources, list) or len(sources) > 100:
+            raise StoreError("Invalid source metadata.")
+        if any(not isinstance(item, dict) or not set(item).issubset(allowed) or any(value is not None and type(value) not in (str, int, bool) for value in item.values()) for item in sources):
+            raise StoreError("Invalid source metadata.")
+        encoded = json.dumps(sources)
+        if len(encoded.encode("utf-8")) > 65536:
+            raise StoreError("Source metadata is too large.")
+        with self._connection(write=True) as connection:
+            row = connection.execute("SELECT status,claim_token,payload FROM tasks WHERE id=?", (task["id"],)).fetchone()
+            if row is None or row["status"] != "running" or row["claim_token"] != task.get("claim_token"):
+                return False
+            payload = json.loads(row["payload"])
+            if payload.get("epoch") != self._setting(connection, "conversation_epoch") or str(payload.get("knowledge_epoch", "0")) != self._setting(connection, "knowledge_epoch"):
+                return False
+            payload["sources"] = sources
+            connection.execute("UPDATE tasks SET payload=? WHERE id=?", (json.dumps(payload), task["id"]))
+            return True
 
     def get_reply_context(self, task):
         """Return up to 12 prior live messages, followed by this task's user turn.
@@ -296,11 +345,22 @@ class Store:
             payload = json.loads(row["payload"])
             if payload.get("epoch") != self._setting(connection, "conversation_epoch"):
                 raise StoreError("This conversation changed before the AI request started.", 409)
+            if str(payload.get("knowledge_epoch", "0")) != self._setting(connection, "knowledge_epoch"):
+                raise StoreError("The reference library changed before the AI request started.", 409)
             current = connection.execute("SELECT sequence,role,content,provider FROM messages WHERE task_id=? AND role='user' AND provider='openai'", (task["id"],)).fetchone()
             if current is None:
                 raise StoreError("This AI request has no current user message.", 409)
-            earlier = connection.execute("SELECT role,content,provider FROM messages WHERE provider='openai' AND sequence<? ORDER BY sequence DESC LIMIT 12", (current["sequence"],)).fetchall()
-            history = [dict(message) for message in reversed(earlier)]
+            earlier = connection.execute("SELECT m.role,m.content,m.provider,t.payload AS task_payload FROM messages AS m JOIN tasks AS t ON t.id=m.task_id WHERE m.provider='openai' AND m.sequence<? ORDER BY m.sequence DESC", (current["sequence"],))
+            chosen = []
+            signature = (payload.get("report_id"), payload.get("project_context", False), str(payload.get("knowledge_epoch", "0")))
+            for message in earlier:
+                previous = json.loads(message["task_payload"])
+                previous_signature = (previous.get("report_id"), previous.get("project_context", False), str(previous.get("knowledge_epoch", "0")))
+                if previous_signature == signature:
+                    chosen.append({key: message[key] for key in ("role", "content", "provider")})
+                    if len(chosen) == 12:
+                        break
+            history = list(reversed(chosen))
             history.append({key: current[key] for key in ("role", "content", "provider")})
             connection.execute("COMMIT")
             return history
@@ -324,12 +384,13 @@ class Store:
                 return False
             payload = json.loads(row["payload"])
             if row["kind"] == "mock_reply":
-                if payload["epoch"] != self._setting(connection, "conversation_epoch"):
+                stale_knowledge = payload.get("provider", "preview") == "openai" and str(payload.get("knowledge_epoch", "0")) != self._setting(connection, "knowledge_epoch")
+                if payload["epoch"] != self._setting(connection, "conversation_epoch") or stale_knowledge:
                     connection.execute("UPDATE tasks SET status='cancelled',claim_token=NULL WHERE id=?", (task["id"],))
                     return False
                 connection.execute(
-                    "INSERT INTO messages (id,role,content,created_at,task_id,provider) VALUES (?,'assistant',?,?,?,?)",
-                    (str(uuid.uuid4()), result, timestamp(), task["id"], payload.get("provider", "preview")),
+                    "INSERT INTO messages (id,role,content,created_at,task_id,provider,sources) VALUES (?,'assistant',?,?,?,?,?)",
+                    (str(uuid.uuid4()), result, timestamp(), task["id"], payload.get("provider", "preview"), json.dumps(payload.get("sources", []))),
                 )
             connection.execute("UPDATE tasks SET status='completed',result=?,claim_token=NULL WHERE id=?", (result, task["id"]))
             return True

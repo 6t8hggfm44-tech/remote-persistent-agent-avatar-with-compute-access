@@ -19,6 +19,7 @@ from urllib.parse import urlsplit
 
 from . import __version__
 from .mock_provider import make_draft, make_reply
+from .knowledge import Knowledge
 from .openai_provider import LiveAI, ProviderError
 from .store import Store, StoreError
 
@@ -82,7 +83,7 @@ class PreviewServer(ThreadingHTTPServer):
     daemon_threads = True
     block_on_close = False
 
-    def __init__(self, store, port, ai=None):
+    def __init__(self, store, port, ai=None, knowledge=None):
         self.store = store
         self.connection_lock = threading.RLock()
         self.session_token = secrets.token_urlsafe(32)
@@ -112,6 +113,7 @@ class PreviewServer(ThreadingHTTPServer):
             raise
         try:
             self.ai = ai if ai is not None else LiveAI(store)
+            self.knowledge = knowledge if knowledge is not None else Knowledge(store)
             super().__init__(("127.0.0.1", port), Handler)
         except Exception:
             self._instance_lock.close()
@@ -172,7 +174,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.headers.get("Sec-Fetch-Site") == "cross-site":
             raise StoreError("Cross-site requests are not allowed.", 403)
 
-    def _read_payload(self):
+    def _read_payload(self, maximum=MAX_BODY):
         tokens = self.headers.get_all("X-Session-Token", [])
         if len(tokens) != 1 or not hmac.compare_digest(tokens[0].encode("utf-8"), self.server.session_token.encode("ascii")):
             raise StoreError("Refresh the page to obtain a valid local session token.", 403)
@@ -184,10 +186,10 @@ class Handler(BaseHTTPRequestHandler):
         if len(lengths) != 1 or not lengths[0].isascii() or not lengths[0].isdigit():
             raise StoreError("Provide a valid Content-Length.", 411)
         if len(lengths[0]) > 8:
-            raise StoreError("Request is too large (maximum 16 KiB).", 413)
+            raise StoreError("Request is too large (maximum {} KiB).".format(maximum // 1024), 413)
         length = int(lengths[0])
-        if length > MAX_BODY:
-            raise StoreError("Request is too large (maximum 16 KiB).", 413)
+        if length > maximum:
+            raise StoreError("Request is too large (maximum {} KiB).".format(maximum // 1024), 413)
         try:
             body = self.rfile.read(length)
             if len(body) != length:
@@ -200,9 +202,9 @@ class Handler(BaseHTTPRequestHandler):
         return payload
 
     @staticmethod
-    def _fields(payload, expected):
-        if set(payload) != set(expected):
-            raise StoreError("Expected exactly these fields: {}.".format(", ".join(expected)))
+    def _fields(payload, expected, optional=()):
+        if not set(expected).issubset(payload) or not set(payload).issubset(set(expected) | set(optional)):
+            raise StoreError("Expected these fields: {}{}.".format(", ".join(expected), "; optional: " + ", ".join(optional) if optional else ""))
 
     def do_GET(self):
         try:
@@ -210,12 +212,17 @@ class Handler(BaseHTTPRequestHandler):
             path = urlsplit(self.path).path
             if path == "/api/state":
                 state = self.server.store.get_state()
+                state["library"] = self.server.knowledge.library()
                 connection = self.server.ai.public_state()
                 state["connection"] = connection
                 state["mode"] = "live" if connection["connected"] else "preview"
                 state["capabilities"]["ai"] = connection["connected"]
                 state["session_token"] = self.server.session_token
                 self._json(200, state)
+            elif path == "/api/library":
+                self._json(200, self.server.knowledge.library())
+            elif path.startswith("/api/reports/") and len(path.split("/")) == 4:
+                self._json(200, {"report": self.server.knowledge.get_report(path.split("/")[3])})
             elif path == "/health":
                 healthy = self.server.store.health()
                 connection = self.server.ai.public_state()
@@ -242,12 +249,12 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
             self._check_host_and_origin()
-            payload = self._read_payload()
             path = urlsplit(self.path).path
+            payload = self._read_payload(256 * 1024 if path == "/api/reports" else MAX_BODY)
             if path == "/api/persona":
                 self._json(200, {"persona": self.server.store.update_persona(payload)})
             elif path == "/api/messages":
-                self._fields(payload, ("content", "request_id", "conversation_epoch", "provider"))
+                self._fields(payload, ("content", "request_id", "conversation_epoch", "provider"), ("report_id", "project_context"))
                 if type(payload["conversation_epoch"]) is not int:
                     raise StoreError("conversation_epoch must be an integer.")
                 with self.server.connection_lock:
@@ -255,8 +262,22 @@ class Handler(BaseHTTPRequestHandler):
                     provider = "openai" if connection["connected"] else "preview"
                     if payload["provider"] != provider:
                         raise StoreError("The AI connection changed. Review the current mode before sending your message again.", 409)
-                    task_id = self.server.store.enqueue_message(payload["content"], payload["request_id"], payload["conversation_epoch"], provider=provider, live_can_send=connection["can_send"])
+                    task_id = self.server.store.enqueue_message(payload["content"], payload["request_id"], payload["conversation_epoch"], provider=provider, live_can_send=connection["can_send"], report_id=payload.get("report_id"), project_context=payload.get("project_context", False))
                 self._json(202, {"task_id": task_id})
+            elif path == "/api/memories":
+                self._fields(payload, ("title", "content"))
+                self._json(201, {"memory": self.server.knowledge.create_memory(**payload)})
+            elif path == "/api/reports":
+                self._fields(payload, ("title", "source_name", "source_url", "report_date", "content"))
+                self._json(201, {"report": self.server.knowledge.create_report(**payload)})
+            elif path.startswith("/api/memories/") and path.endswith("/delete") and len(path.split("/")) == 5:
+                self._fields(payload, ())
+                self.server.knowledge.delete_memory(path.split("/")[3])
+                self._json(200, {"ok": True})
+            elif path.startswith("/api/reports/") and path.endswith("/delete") and len(path.split("/")) == 5:
+                self._fields(payload, ())
+                self.server.knowledge.delete_report(path.split("/")[3])
+                self._json(200, {"ok": True})
             elif path == "/api/connection":
                 self._fields(payload, ("api_key",))
                 with self.server.connection_lock:
@@ -288,9 +309,9 @@ class Handler(BaseHTTPRequestHandler):
             self._error(503, "The local preview could not save its data.")
 
 
-def create_server(store, port=8765, ai=None):
+def create_server(store, port=8765, ai=None, knowledge=None):
     """Return a server bound only to 127.0.0.1; port=0 chooses a test port."""
-    return PreviewServer(store, port, ai)
+    return PreviewServer(store, port, ai, knowledge)
 
 
 def main(argv=None):

@@ -1,22 +1,22 @@
 # Remote persistent agent and avatar — build pack
 
-Prepared 2026-09-17; updated 2026-09-18. **Current status: Presence 0.2 provides real OpenAI text replies. Two live tests verified the saved persona and recent conversation context. EA integration is on hold.**
+Prepared 2026-09-17; updated 2026-09-18. **Current status: Presence 0.3 adds explicit saved memory, a private document/report library, and bounded access to project documentation. EA integration is on hold.**
 
 Repository: [remote-persistent-agent-avatar-with-compute-access](https://github.com/6t8hggfm44-tech/remote-persistent-agent-avatar-with-compute-access).
 
 ## Open the working local prototype
 
-**Presence 0.2** lets you edit a persona, use preview conversations and persistent sample tasks, and connect OpenAI for bounded text testing. It runs locally with Python 3.9+ and no third-party packages. Preview mode is free; real replies use separately authorized API credit.
+**Presence 0.3** lets you edit a persona, save durable memory notes, select repository documents and reports for AI conversations, and inspect the supplied sources. It also retains preview conversations and persistent sample tasks. It runs locally with Python 3.9+ and no third-party packages. Preview mode is free; real replies use separately authorized API credit.
 
 ```sh
 python3 -B -m app.server --port 8765
 ```
 
-Then open [http://127.0.0.1:8765](http://127.0.0.1:8765). On a Mac, `start.command` starts the same service. Keep it running while using the app. [Read the prototype guide, verified behavior and limitations](docs/09-local-prototype.md).
+Then open [http://127.0.0.1:8765](http://127.0.0.1:8765). On a Mac, `start.command` starts the same service. Keep it running while using the app. [Read the memory and repository conversation guide](docs/11-memory-and-repository-conversations.md).
 
-The app starts in scripted preview mode. The [live text connection guide](docs/10-live-text-connection.md) explains key entry, test allowance, data handling and verified boundaries. Voice, Unreal and EA remain disconnected. Conversations, persona settings and usage reservations stay in ignored local `runtime-data/`; credentials stay in server memory only. Private runtime data is excluded from Git and source bundles.
+The app starts in scripted preview mode. The [live text connection guide](docs/10-live-text-connection.md) explains key entry, test allowance, data handling and verified boundaries. Voice, Unreal and EA remain disconnected. Conversations, persona settings, memories, imported documents and usage reservations stay in ignored local `runtime-data/`; credentials stay in server memory only. Private runtime data is excluded from Git and source bundles.
 
-The detailed roadmap below remains the plan for later stages. This local milestone deliberately uses SQLite and a dependency-free server before moving to the proposed production stack.
+The immediate priority is repository discussion, durable memory and controlled tools before speech. A repository snapshot is not a live connection, and imported agent instructions remain source data. The detailed roadmap below remains the plan for later stages. This local milestone deliberately uses SQLite and a dependency-free server before moving to the proposed production stack.
 
 ## Recommended outcome
 
@@ -33,6 +33,7 @@ The first implementation should use a controlled speech chain: microphone → tr
 
 | Reader / purpose | File |
 |---|---|
+| Current memory and repository milestone | [Memory and repository conversations](docs/11-memory-and-repository-conversations.md) |
 | Pete: architecture and choices | [System design](docs/01-system-design.md) |
 | Build the persistent backend | [Backend workflow](docs/02-backend-workflow.md) |
 | Provision and operate remote graphics | [Workstation workflow and costs](docs/03-workstation-workflow.md) |

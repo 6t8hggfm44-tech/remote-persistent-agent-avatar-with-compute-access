@@ -861,6 +861,92 @@
       "evidence": [
         "docs/10-live-text-connection.md"
       ]
+    },
+    {
+      "id": "P6",
+      "title": "Explicit durable memory and private document library",
+      "project": "backend",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [
+        "P5"
+      ],
+      "requires": [
+        "local_prototype_implementation"
+      ],
+      "workflow": "docs/11-memory-and-repository-conversations.md",
+      "section": "Technical contract and verification",
+      "deliverable": "Explicit durable memory and private document library",
+      "acceptance": [
+        "Library survives restart and conversation reset",
+        "Deletion fences queued/in-flight replies; imported instructions execute no actions"
+      ],
+      "test_ids": [
+        "local_55_test_regression",
+        "private_state_migration",
+        "browser_library_390px_638px"
+      ],
+      "evidence": [
+        "docs/11-memory-and-repository-conversations.md",
+        "tests/test_knowledge.py"
+      ],
+      "on_block": "Preserve existing private state, report the failed check and continue independent authorized work."
+    },
+    {
+      "id": "P7",
+      "title": "Bounded source-grounded repository conversations",
+      "project": "backend",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [
+        "P6"
+      ],
+      "requires": [
+        "local_prototype_implementation"
+      ],
+      "workflow": "docs/11-memory-and-repository-conversations.md",
+      "section": "Technical contract and verification",
+      "deliverable": "Bounded source-grounded repository conversations",
+      "acceptance": [
+        "Exact document selection and provenance reach synthetic provider",
+        "History is isolated across source and library revisions",
+        "Allowed local documentation is readable; traversal and symlinks denied"
+      ],
+      "test_ids": [
+        "local_55_test_regression",
+        "private_state_migration",
+        "browser_library_390px_638px"
+      ],
+      "evidence": [
+        "docs/11-memory-and-repository-conversations.md",
+        "tests/test_knowledge.py"
+      ],
+      "on_block": "Preserve existing private state, report the failed check and continue independent authorized work."
+    },
+    {
+      "id": "P8",
+      "title": "Read-only adapter for named GitHub repositories",
+      "project": "backend",
+      "status": "planned",
+      "optional": false,
+      "depends_on": [
+        "P7"
+      ],
+      "requires": [
+        "named_repository_scope",
+        "runtime_read_only_GitHub_credential"
+      ],
+      "workflow": "docs/11-memory-and-repository-conversations.md",
+      "section": "Next implementation sequence",
+      "deliverable": "Explicit source picker and refresh with pinned revisions",
+      "acceptance": [
+        "Runtime credential separated from Codex connector",
+        "Only selected repositories and bounded text paths readable",
+        "Source revision and freshness visible; no writes or agent activation"
+      ],
+      "test_ids": [],
+      "evidence": [],
+      "on_block": "Use explicit private document snapshots and name the missing runtime access."
     }
   ],
   "status_rule": "verified requires actual evidence; requirements are not grants",

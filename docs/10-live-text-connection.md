@@ -1,5 +1,7 @@
 # Presence 0.2 — bounded live text connection
 
+Presence 0.3 retains this connection setup and adds saved memory and document excerpts. See [the current memory and repository guide](11-memory-and-repository-conversations.md) for the expanded data disclosure and verified scope. The two live tests below are historical version 0.2 evidence.
+
 The OpenAI connection is implemented and verified with two real text requests on 2026-09-18, following user credential entry and an explicitly authorized initial allowance. Executive Agent, voice, Unreal rendering and external tools stay deferred.
 
 ## Connect and test

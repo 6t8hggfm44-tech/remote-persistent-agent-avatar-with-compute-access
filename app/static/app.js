@@ -1,8 +1,8 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const emptyConversation = $('#conversation-empty').cloneNode(true);
-const model = { state: null, token: '', view: 'conversation', online: false, dirtyPersona: false, submitting: false, savingPersona: false, creatingTask: false, resetting: false, connecting: false, disconnecting: false, request: null, messageSignature: '', taskSignature: '', toastTimer: null };
-const titles = { conversation: 'Conversation', persona: 'Persona', activity: 'Activity', connection: 'Connection' };
+const model = { state: null, token: '', view: 'conversation', online: false, dirtyPersona: false, submitting: false, savingPersona: false, creatingTask: false, resetting: false, connecting: false, disconnecting: false, request: null, messageSignature: '', taskSignature: '', toastTimer: null, library: { memories: [], reports: [] }, libraryLoaded: false, librarySignature: '', savingMemory: false, savingReport: false, readingFile: false, fileReadVersion: 0, deletingLibrary: false, deleteItem: null, readerReport: null, readingReport: false };
+const titles = { conversation: 'Conversation', persona: 'Persona', activity: 'Activity', connection: 'Connection', library: 'Library' };
 const realTask = (task) => task.provider === 'openai';
 const replyTask = (task) => task.kind !== 'draft';
 const connected = () => Boolean(model.state?.connection?.connected);
@@ -42,6 +42,12 @@ function setOnline(online) {
   $('#reset-open').disabled = !online || model.submitting || model.resetting;
   $('#persona-save').disabled = !online || model.savingPersona;
   $('#task-form button').disabled = !online || model.creatingTask;
+  $('#memory-save').disabled = !online || !model.libraryLoaded || model.savingMemory;
+  $('#report-save').disabled = !online || !model.libraryLoaded || model.savingReport || model.readingFile;
+  $('#library-delete-confirm').disabled = !online || model.deletingLibrary;
+  $('#report-select').disabled = !online || !model.libraryLoaded || model.submitting;
+  $('#project-context').disabled = !online || model.submitting;
+  $$('[data-library-delete]').forEach(button => { button.disabled = !online || model.deletingLibrary; });
 }
 
 function switchView(view) {
@@ -86,6 +92,151 @@ function renderPersonaPreview() {
   $('#persona-preview-copy').textContent = copy;
 }
 
+function safeSourceUrl(value) {
+  try { const url = new URL(value); return url.protocol === 'https:' ? url.href : null; }
+  catch { return null; }
+}
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function libraryDate(value) {
+  if (!value) return 'Date not recorded';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 'Date not recorded' : date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function renderSources(sources) {
+  if (!Array.isArray(sources) || !sources.length) return null;
+  const details = element('details', 'message-sources');
+  details.append(element('summary', '', `Sources provided · ${sources.length}`));
+  const list = element('div', 'source-list');
+  for (const source of sources) {
+    const card = element('div', 'source-reference');
+    card.append(element('strong', '', `${source.citation || ''} ${source.title || 'Saved source'}`.trim()));
+    const metadata = [];
+    if (source.kind === 'memory') metadata.push('Saved memory', `Updated ${libraryDate(source.updated_at)}`);
+    else if (source.kind === 'project') metadata.push('Presence project document', source.path || '');
+    else metadata.push(source.source_name || 'Saved document', libraryDate(source.report_date));
+    if (source.line_start) metadata.push(`Lines ${source.line_start}–${source.line_end || source.line_start}`);
+    if (source.truncated) metadata.push('Excerpt');
+    card.append(element('p', '', metadata.filter(Boolean).join(' · ')));
+    const actions = element('div', 'source-actions');
+    if (source.kind === 'report' && source.id) {
+      const view = element('button', 'text-button', 'View saved text'); view.type = 'button'; view.dataset.reportView = source.id; actions.append(view);
+    }
+    const url = safeSourceUrl(source.source_url);
+    if (url) { const link = element('a', 'text-button', 'Source link ↗'); link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer'; actions.append(link); }
+    if (actions.children.length) card.append(actions);
+    list.append(card);
+  }
+  details.append(list);
+  return details;
+}
+
+function switchLibraryTab(tab) {
+  const memory = tab !== 'documents';
+  $('#memory-panel').hidden = !memory;
+  $('#documents-panel').hidden = memory;
+  $('#memory-tab').setAttribute('aria-selected', String(memory));
+  $('#documents-tab').setAttribute('aria-selected', String(!memory));
+  $('#memory-tab').tabIndex = memory ? 0 : -1;
+  $('#documents-tab').tabIndex = memory ? -1 : 0;
+}
+
+function renderLibrary(library) {
+  model.library = library;
+  model.libraryLoaded = true;
+  $('#library-load-status').textContent = 'Saved on this computer. Relevant notes and chosen excerpts may be included in real AI replies.';
+  const signature = JSON.stringify(library);
+  if (signature === model.librarySignature) return;
+  model.librarySignature = signature;
+  const memories = library.memories || [];
+  const reports = library.reports || [];
+  $('#memory-count').textContent = memories.length;
+  $('#document-count').textContent = reports.length;
+  const memoryCards = document.createDocumentFragment();
+  for (const memory of memories) {
+    const card = element('article', 'library-item memory-item');
+    const heading = element('div', 'library-item-heading');
+    heading.append(element('h4', '', memory.title));
+    const remove = element('button', 'text-button delete-link', 'Delete'); remove.type = 'button'; remove.dataset.libraryDelete = memory.id; remove.dataset.libraryKind = 'memory'; heading.append(remove);
+    card.append(heading, element('p', 'library-item-meta', `Saved memory · ${libraryDate(memory.updated_at || memory.created_at)}`), element('p', 'memory-content', memory.content));
+    memoryCards.append(card);
+  }
+  if (!memories.length) memoryCards.append(element('p', 'library-empty', 'No saved memories yet. Start with something useful about you or your work.'));
+  $('#memory-list').replaceChildren(memoryCards);
+  const reportCards = document.createDocumentFragment();
+  for (const report of reports) {
+    const card = element('article', 'library-item report-item');
+    card.append(element('span', 'document-type', 'SAVED TEXT'), element('h4', '', report.title), element('p', 'library-item-meta', `${report.source_name || 'Source not recorded'} · ${libraryDate(report.report_date)}`));
+    const url = safeSourceUrl(report.source_url);
+    if (url) { const link = element('a', 'document-source-link', 'Source link ↗'); link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer'; card.append(link); }
+    const actions = element('div', 'library-item-actions');
+    const discuss = element('button', 'secondary-button', 'Discuss this'); discuss.type = 'button'; discuss.dataset.reportDiscuss = report.id;
+    const view = element('button', 'text-button', 'View text'); view.type = 'button'; view.dataset.reportView = report.id;
+    const remove = element('button', 'text-button delete-link', 'Delete'); remove.type = 'button'; remove.dataset.libraryDelete = report.id; remove.dataset.libraryKind = 'report';
+    actions.append(discuss, view, remove); card.append(actions); reportCards.append(card);
+  }
+  if (!reports.length) reportCards.append(element('p', 'library-empty', 'Add a document, then choose “Discuss this” to bring it into a conversation.'));
+  $('#report-list').replaceChildren(reportCards);
+  const select = $('#report-select');
+  const selected = select.value;
+  const options = document.createDocumentFragment();
+  const none = element('option', '', 'No document selected'); none.value = ''; options.append(none);
+  for (const report of reports) { const option = element('option', '', report.title); option.value = report.id; options.append(option); }
+  select.replaceChildren(options);
+  if (reports.some(report => report.id === selected)) select.value = selected;
+  else if (selected) toast('The selected document was removed. Choose another document before sending.');
+}
+
+async function refreshLibrary() {
+  try { renderLibrary(await api('/api/library')); setOnline(model.online); }
+  catch (error) { $('#library-load-status').textContent = error.message; }
+}
+
+function discussReport(id) {
+  if (!model.library.reports.some(report => report.id === id)) { toast('This document is no longer in your library.', true); return; }
+  if (model.submitting) { toast('Wait for your current message to finish sending.'); return; }
+  $('#report-select').value = id;
+  switchView('conversation');
+  $('#report-reader').close();
+  $('#message-input').focus();
+  toast('Document selected. Ask a question when you’re ready.');
+}
+
+async function readReport(id) {
+  if (model.readingReport) return;
+  model.readingReport = true;
+  try {
+    const { report } = await api(`/api/reports/${encodeURIComponent(id)}`);
+    model.readerReport = report;
+    $('#reader-title').textContent = report.title;
+    $('#reader-meta').textContent = `${report.source_name || 'Source not recorded'} · ${libraryDate(report.report_date)}`;
+    $('#reader-content').textContent = report.content;
+    const url = safeSourceUrl(report.source_url);
+    $('#reader-source').hidden = !url;
+    if (url) $('#reader-source').href = url;
+    else $('#reader-source').removeAttribute('href');
+    $('#report-reader').showModal();
+  } catch (error) { toast(error.message, true); }
+  finally { model.readingReport = false; }
+}
+
+function reviewDelete(kind, id) {
+  const item = (kind === 'memory' ? model.library.memories : model.library.reports).find(entry => entry.id === id);
+  if (!item) return;
+  model.deleteItem = { kind, id, title: item.title };
+  $('#library-delete-title').textContent = kind === 'memory' ? 'Delete this memory?' : 'Delete this document?';
+  $('#library-delete-copy').textContent = `“${item.title}” will no longer be available for new replies. This cannot be undone in Presence.`;
+  $('#library-delete-dialog').showModal();
+}
+
 function renderMessages(state) {
   const signature = JSON.stringify(state.messages);
   if (signature === model.messageSignature) return;
@@ -108,6 +259,8 @@ function renderMessages(state) {
     content.className = 'message-content';
     content.textContent = item.content;
     entry.append(label, content);
+    const sources = renderSources(item.sources);
+    if (sources) entry.append(sources);
     fragment.append(entry);
   }
   region.replaceChildren(fragment);
@@ -164,7 +317,7 @@ function renderConnection(state) {
   $('#mode-badge').classList.toggle('live-mode', live);
   $('#mode-notice').classList.toggle('live-notice', live);
   $('#mode-notice-copy').textContent = live
-    ? connection.verified ? 'Real AI replies use your persona and API credit. Voice and the 3D avatar remain off.' : 'Your key is loaded. Send a message to test real AI replies using your approved allowance.'
+    ? connection.verified ? 'Real replies use your persona, relevant memories, and selected source excerpts. Voice and the 3D avatar remain off.' : 'Your key is loaded. Send a message to test real AI replies using your approved allowance.'
     : 'Preview mode is active. Replies are simulated. Connect OpenAI for real text conversations.';
   $('#connect-cta').hidden = live;
   $('#ai-connection-summary').textContent = status;
@@ -198,6 +351,7 @@ function renderState(state) {
   $('#tone-summary').textContent = titleCase(state.persona.tone);
   $('#length-summary').textContent = `${titleCase(state.persona.response_length)} replies`;
   if (!model.dirtyPersona && !$('#persona-form').contains(document.activeElement)) fillPersona(state.persona);
+  if (state.library) renderLibrary(state.library);
   renderConnection(state);
   renderMessages(state);
   renderTasks(state);
@@ -216,7 +370,9 @@ async function submitMessage() {
   const input = $('#message-input');
   const content = input.value.trim();
   if (!content || !canSend()) return;
-  if (!model.request || model.request.content !== content) model.request = { content, request_id: crypto.randomUUID(), conversation_epoch: model.state.conversation_epoch, provider: model.state.mode === 'live' ? 'openai' : 'preview' };
+  const reportId = $('#report-select').value || null;
+  const projectContext = $('#project-context').checked;
+  if (!model.request || model.request.content !== content || model.request.report_id !== reportId || model.request.project_context !== projectContext) model.request = { content, request_id: crypto.randomUUID(), conversation_epoch: model.state.conversation_epoch, provider: model.state.mode === 'live' ? 'openai' : 'preview', report_id: reportId, project_context: projectContext };
   model.submitting = true; setOnline(model.online);
   try {
     await api('/api/messages', model.request);
@@ -230,6 +386,10 @@ async function submitMessage() {
 
 document.addEventListener('click', async event => {
   const view = event.target.closest('[data-view]'); if (view) switchView(view.dataset.view);
+  const libraryTab = event.target.closest('[data-library-tab]'); if (libraryTab) switchLibraryTab(libraryTab.dataset.libraryTab);
+  const reportDiscuss = event.target.closest('[data-report-discuss]'); if (reportDiscuss) discussReport(reportDiscuss.dataset.reportDiscuss);
+  const reportView = event.target.closest('[data-report-view]'); if (reportView) await readReport(reportView.dataset.reportView);
+  const libraryDelete = event.target.closest('[data-library-delete]'); if (libraryDelete) reviewDelete(libraryDelete.dataset.libraryKind, libraryDelete.dataset.libraryDelete);
   const prompt = event.target.closest('[data-prompt]');
   if (prompt) { $('#message-input').value = prompt.dataset.prompt; await submitMessage(); }
   const cancel = event.target.closest('[data-cancel-task]');
@@ -239,6 +399,78 @@ document.addEventListener('click', async event => {
     catch (error) { toast(error.message, true); cancel.disabled = false; }
   }
 });
+
+function readMemoryForm() {
+  return { title: $('#memory-title').value.trim(), content: $('#memory-content').value.trim() };
+}
+function readReportForm() {
+  return { title: $('#report-title').value.trim(), source_name: $('#report-source').value.trim(), source_url: $('#report-url').value.trim(), report_date: $('#report-date').value, content: $('#report-content').value };
+}
+$('#memory-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!model.online || model.savingMemory || !model.libraryLoaded) return;
+  const saved = readMemoryForm();
+  model.savingMemory = true; setOnline(model.online);
+  try {
+    await api('/api/memories', saved);
+    if (JSON.stringify(readMemoryForm()) === JSON.stringify(saved)) $('#memory-form').reset();
+    $('#memory-save-status').textContent = 'Memory saved for future conversations.';
+    await refreshLibrary(); await refresh(); toast('Memory saved.');
+  } catch (error) { $('#memory-save-status').textContent = error.message; toast(error.message, true); }
+  finally { model.savingMemory = false; setOnline(model.online); }
+});
+$('#report-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!model.online || model.savingReport || model.readingFile || !model.libraryLoaded) return;
+  const saved = readReportForm();
+  if (saved.source_url && !safeSourceUrl(saved.source_url)) { toast('Use an https:// source link, or leave it blank.', true); return; }
+  model.savingReport = true; setOnline(model.online);
+  try {
+    await api('/api/reports', saved);
+    if (JSON.stringify(readReportForm()) === JSON.stringify(saved)) { $('#report-form').reset(); $('#report-file-status').textContent = 'Plain text or Markdown, up to 60,000 characters. Review the text before saving.'; }
+    $('#report-save-status').textContent = 'Document saved. Choose “Discuss this” when you’re ready.';
+    await refreshLibrary(); await refresh(); toast('Document saved to your library.');
+  } catch (error) { $('#report-save-status').textContent = error.message; toast(error.message, true); }
+  finally { model.savingReport = false; setOnline(model.online); }
+});
+$('#report-file').addEventListener('change', async event => {
+  const file = event.target.files[0];
+  const version = ++model.fileReadVersion;
+  if (!file) return;
+  const originalText = $('#report-content').value;
+  model.readingFile = true; setOnline(model.online);
+  try {
+    if (!/\.(txt|md)$/i.test(file.name) || file.size > 240000) throw new Error('Choose a plain .txt or .md file up to 60,000 characters.');
+    const text = await file.text();
+    if (version !== model.fileReadVersion) return;
+    if (text.length > 60000 || text.includes('\0')) throw new Error('This file must contain plain text of no more than 60,000 characters.');
+    if ($('#report-content').value !== originalText) throw new Error('The text changed while your file was loading. Choose the file again if you want to replace it.');
+    $('#report-content').value = text;
+    if (!$('#report-title').value.trim()) $('#report-title').value = file.name.replace(/\.(txt|md)$/i, '').slice(0, 160);
+    $('#report-file-status').textContent = `${file.name} · ${text.length.toLocaleString()} characters loaded. Review before saving.`;
+  } catch (error) { $('#report-file-status').textContent = error.message; toast(error.message, true); }
+  finally { if (version === model.fileReadVersion) { model.readingFile = false; event.target.value = ''; setOnline(model.online); } }
+});
+$('#library-delete-confirm').addEventListener('click', async () => {
+  if (!model.online || model.deletingLibrary || !model.deleteItem) return;
+  const item = model.deleteItem;
+  model.deletingLibrary = true; setOnline(model.online);
+  try {
+    await api(`/api/${item.kind === 'memory' ? 'memories' : 'reports'}/${encodeURIComponent(item.id)}/delete`, {});
+    $('#library-delete-dialog').close(); model.deleteItem = null;
+    await refreshLibrary(); await refresh(); toast(item.kind === 'memory' ? 'Memory removed from your library.' : 'Document removed from your library.');
+  } catch (error) { toast(error.message, true); }
+  finally { model.deletingLibrary = false; setOnline(model.online); }
+});
+$('.library-tabs').addEventListener('keydown', event => {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const next = event.key === 'Home' ? 'memory' : event.key === 'End' ? 'documents' : $('#memory-tab').getAttribute('aria-selected') === 'true' ? 'documents' : 'memory';
+  switchLibraryTab(next);
+  $(`#${next === 'memory' ? 'memory' : 'documents'}-tab`).focus();
+});
+$('#reader-close').addEventListener('click', () => $('#report-reader').close());
+$('#reader-discuss').addEventListener('click', () => { if (model.readerReport) discussReport(model.readerReport.id); });
 
 $('#connection-form').addEventListener('submit', async event => {
   event.preventDefault();
@@ -312,15 +544,17 @@ $('#reset-confirm').addEventListener('click', async () => {
   if (model.submitting || model.resetting || !model.online) return;
   model.resetting = true; setOnline(model.online);
   const button = $('#reset-confirm'); button.disabled = true;
-  try { await api('/api/conversation/reset', {}); model.request = null; $('#reset-dialog').close(); await refresh(); toast('Conversation reset. Your persona is saved.'); }
+  try { await api('/api/conversation/reset', {}); model.request = null; $('#reset-dialog').close(); await refresh(); toast('Conversation reset. Your persona and library are saved.'); }
   catch (error) { toast(error.message, true); }
   finally { model.resetting = false; button.disabled = false; setOnline(model.online); }
 });
 window.addEventListener('hashchange', () => switchView(location.hash.slice(1)));
-window.addEventListener('beforeunload', event => { if (model.dirtyPersona) { event.preventDefault(); event.returnValue = ''; } });
+window.addEventListener('beforeunload', event => { if (model.dirtyPersona || Object.values(readMemoryForm()).some(Boolean) || Object.values(readReportForm()).some(Boolean)) { event.preventDefault(); event.returnValue = ''; } });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 switchView(location.hash.slice(1));
+switchLibraryTab('memory');
 setOnline(false);
 await refresh();
+if (!model.libraryLoaded && model.online) await refreshLibrary();
 async function poll() { await refresh(); setTimeout(poll, document.hidden ? 3000 : 850); }
 setTimeout(poll, 850);
