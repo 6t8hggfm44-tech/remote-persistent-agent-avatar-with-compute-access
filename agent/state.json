@@ -1,37 +1,96 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-09-17",
+  "as_of": "2026-09-20",
   "planning_status": "complete",
-  "implementation_status": "not_started",
-  "runtime_test_status": "not_run",
+  "implementation_status": "local_memory_and_source_context_verified",
+  "runtime_test_status": "55_offline_tests_passed; browser_library_and_mobile_layout_verified; no_new_paid_calls",
   "ea_active": false,
   "ea_initialization_completed": false,
   "deployed_endpoint": null,
   "active_run_id": null,
   "approved_spending": null,
   "enabled_schedules": [],
-  "runtime_grants": [],
-  "completed_build_tasks": [],
-  "last_completed_work": "Research, design, execution instructions and handoff bundle",
-  "next_action": "Wait for Pete to select next implementation scope; then inspect current repository and authorize required access.",
+  "runtime_grants": [
+    "local_prototype_implementation",
+    "bounded_live_text_implementation",
+    "explicit_memory_and_source_context_implementation"
+  ],
+  "completed_build_tasks": [
+    "P0",
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6",
+    "P7"
+  ],
+  "last_completed_work": "Private saved memory, selected-document context with provenance, bounded local project reads, and source-history isolation; verified without paid API calls",
+  "next_action": "Complete the authorized remote Windows GPU preparation and final configuration/price handoff; Pete handles checkout/payment, then verify remote access before the isolated Unreal build",
   "recommended_first_milestone": [
-    "B0",
-    "B1",
-    "B2a",
-    "B3",
-    "B4"
+    "W0",
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "A0",
+    "A1"
   ],
-  "parallel_preparation": [
-    "W0 quote preparation only",
-    "W1/W2 preflight script preparation"
-  ],
+  "parallel_preparation": [],
   "open_decisions": [
-    "hosting and identity",
-    "GPU quote and remote access",
-    "API usage cap and models",
-    "private state/assets/evidence stores",
-    "packaged runtime facial solver"
+    "Final remote Windows GPU checkout configuration/price and recurring storage charge for Pete to review and pay",
+    "Required remote access, installer permissions and Epic account/license steps",
+    "Character appearance and sample greeting for the isolated Unreal demo"
   ],
   "state_privacy": "public_sanitized_summary; actual run records stay private",
-  "restart_rule": "Infrastructure restart never activates EA or revives ended/revoked scope; resume only still-valid authorized work after required checks."
+  "restart_rule": "Infrastructure restart never activates EA or revives ended/revoked scope; resume only still-valid authorized work after required checks.",
+  "local_preview_url": "http://127.0.0.1:8765",
+  "ea_integration": "deferred_by_user",
+  "live_api_verified": true,
+  "live_api_calls_made": 2,
+  "live_test_usage": {
+    "input_tokens": 438,
+    "output_tokens": 35,
+    "estimated_cost_usd": 0.000131,
+    "reserved_allowance_usd": 0.04,
+    "billing_authority": "OpenAI dashboard"
+  },
+  "current_increment": {
+    "version": "0.3.0",
+    "automated_tests_passed": 55,
+    "new_paid_calls": 0,
+    "browser_verified": [
+      "library_memory_and_documents",
+      "saved_text_reader",
+      "exact_document_selection",
+      "390px_mobile_no_overflow",
+      "638px_normal_no_overflow"
+    ],
+    "private_state_preserved": true,
+    "runtime_key_requires_reconnection": true,
+    "source_mode": "local_snapshots; no automatic repository refresh",
+    "evidence": "docs/11-memory-and-repository-conversations.md"
+  },
+  "current_priority": {
+    "scope": "isolated_Unreal_character_first",
+    "approved_direction": "Remote Windows GPU workstation and one saved character/scene with a fabricated/sample greeting",
+    "spending_status": "final_price_and_recurring_charge_pending_user_checkout_review; no_autonomous_purchase_authority",
+    "workstation_purchased": false,
+    "workstation_installed": false,
+    "unreal_scene_built": false,
+    "initial_persistence": "Saved character identity and scene across launches; no 24/7 operation",
+    "deferred": [
+      "additional_report_or_repository_access",
+      "EA_integration",
+      "new_live_API_calls",
+      "generic_chat_features",
+      "report_connected_dialogue",
+      "continuous_operation"
+    ],
+    "preserve": "Existing Presence app, local data and retained report snapshots; no deletions",
+    "data_boundary": "Use fabricated/sample greeting only; avatar receives no report access or API keys",
+    "copy_limit": "Reading necessarily copies data into memory; cloud AI transmits excerpts. Do not promise read access without copying.",
+    "preparation_authorized": true,
+    "oracle_account_and_instance_status": "not_verified_in_this_phase; do_not_assume_absent"
+  }
 }

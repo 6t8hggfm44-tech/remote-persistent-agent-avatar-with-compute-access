@@ -54,5 +54,32 @@
     "private_evidence_ref": null,
     "secret_store_ref": null
   },
-  "not_secret_values": "Only names/references belong here; actual identifiers and secrets may need private configuration."
+  "not_secret_values": "Only names/references belong here; actual identifiers and secrets may need private configuration.",
+  "local_prototype": {
+    "python_tested": "3.9.6",
+    "dependencies": "standard library",
+    "database": "sqlite3",
+    "frontend": "HTML CSS JavaScript",
+    "tested_browser": "Codex in-app browser",
+    "version": "0.1.0",
+    "EA_connected": false,
+    "live_AI_connected": false
+  },
+  "live_text_profile": {
+    "model": "gpt-5.6-luna",
+    "endpoint": "https://api.openai.com/v1/responses",
+    "reasoning": "none",
+    "store": false,
+    "service_tier": "default",
+    "max_output_tokens": 1000,
+    "max_payload_bytes": 30000,
+    "attempt_reservation_usd": 0.02,
+    "new_data_directory_allowance_usd": 0,
+    "max_initial_test_allowance_usd": 1,
+    "auto_retry": false,
+    "key_storage": "process_memory_only",
+    "live_verified": true,
+    "guide": "docs/10-live-text-connection.md",
+    "verified_date": "2026-09-18"
+  }
 }

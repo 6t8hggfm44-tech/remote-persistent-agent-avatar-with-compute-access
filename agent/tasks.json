@@ -49,7 +49,7 @@
       "id": "B2a",
       "title": "Governance loader against synthetic fixtures",
       "project": "backend",
-      "status": "planned",
+      "status": "deferred",
       "optional": false,
       "depends_on": [
         "B1"
@@ -68,13 +68,14 @@
         "T03"
       ],
       "evidence": [],
-      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion.",
+      "deferred_reason": "Pete set EA integration aside."
     },
     {
       "id": "B2b",
       "title": "Authorized live governance integration gate",
       "project": "backend",
-      "status": "planned",
+      "status": "deferred",
       "optional": false,
       "depends_on": [
         "B2a"
@@ -93,7 +94,8 @@
         "T03"
       ],
       "evidence": [],
-      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion.",
+      "deferred_reason": "Pete set EA integration aside."
     },
     {
       "id": "B3",
@@ -314,11 +316,10 @@
       "project": "workstation",
       "status": "planned",
       "optional": false,
-      "depends_on": [
-        "B0"
-      ],
+      "depends_on": [],
       "requires": [
-        "purchase_authorization_for_subscription_only"
+        "concrete_host_configuration_region_and_cost_approval",
+        "required_provider_account_steps"
       ],
       "workflow": "docs/03-workstation-workflow.md",
       "section": "W0",
@@ -328,7 +329,8 @@
       ],
       "test_ids": [],
       "evidence": [],
-      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion.",
+      "scope_note": "Prepare the quote and access proposal now. This avatar-first workstation decision is independent of the broader backend B0 milestone; purchase/provision remains gated on cost approval."
     },
     {
       "id": "W1",
@@ -380,7 +382,7 @@
     },
     {
       "id": "W3",
-      "title": "Install and pin Unreal compiler Blender toolchain",
+      "title": "Install and pin the Unreal build toolchain",
       "project": "workstation",
       "status": "planned",
       "optional": false,
@@ -393,16 +395,17 @@
       ],
       "workflow": "docs/03-workstation-workflow.md",
       "section": "W3",
-      "deliverable": "Install and pin Unreal compiler Blender toolchain",
+      "deliverable": "Pinned Unreal engine, compiler and prerequisites for the isolated character demo",
       "acceptance": [
-        "Blank Unreal package launches and Blender test renders"
+        "Blank Unreal package launches; installed Unreal/compiler versions and prerequisites are recorded"
       ],
       "test_ids": [
         "T01",
         "T13"
       ],
       "evidence": [],
-      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion.",
+      "scope_note": "Install only prerequisites needed for the isolated Unreal demo. Broader Blender and backend setup are outside this milestone."
     },
     {
       "id": "W4",
@@ -572,7 +575,9 @@
       "section": "A1",
       "deliverable": "One MetaHuman and packaged deterministic audio",
       "acceptance": [
-        "One scene package starts editor closed; fixture heard once"
+        "One scene package starts with the editor closed and a fabricated/sample greeting is heard once",
+        "Saved character identity and scene reopen consistently; no claim of 24/7 operation",
+        "Demo is isolated from reports, Presence data, EA and live API keys/calls"
       ],
       "test_ids": [
         "T10",
@@ -713,8 +718,257 @@
       ],
       "evidence": [],
       "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+    },
+    {
+      "id": "P0",
+      "title": "Confirm local persona-first scope without EA",
+      "project": "local_prototype",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [],
+      "requires": [
+        "local_implementation_authorized"
+      ],
+      "workflow": "docs/09-local-prototype.md",
+      "section": "Confirm local persona-first scope without EA",
+      "deliverable": "Confirm local persona-first scope without EA",
+      "acceptance": [
+        "Implemented local milestone; limits explicit"
+      ],
+      "test_ids": [],
+      "evidence": [
+        "docs/09-local-prototype.md"
+      ],
+      "on_block": "Report the actual missing capability."
+    },
+    {
+      "id": "P1",
+      "title": "Build editable persona and browser interface",
+      "project": "local_prototype",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [
+        "P0"
+      ],
+      "requires": [
+        "local_implementation_authorized"
+      ],
+      "workflow": "docs/09-local-prototype.md",
+      "section": "Build editable persona and browser interface",
+      "deliverable": "Build editable persona and browser interface",
+      "acceptance": [
+        "Implemented local milestone; limits explicit"
+      ],
+      "test_ids": [],
+      "evidence": [
+        "docs/09-local-prototype.md"
+      ],
+      "on_block": "Report the actual missing capability."
+    },
+    {
+      "id": "P2",
+      "title": "Persist conversations and recoverable mock jobs",
+      "project": "local_prototype",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [
+        "P0"
+      ],
+      "requires": [
+        "local_implementation_authorized"
+      ],
+      "workflow": "docs/09-local-prototype.md",
+      "section": "Persist conversations and recoverable mock jobs",
+      "deliverable": "Persist conversations and recoverable mock jobs",
+      "acceptance": [
+        "Implemented local milestone; limits explicit"
+      ],
+      "test_ids": [],
+      "evidence": [
+        "docs/09-local-prototype.md"
+      ],
+      "on_block": "Report the actual missing capability."
+    },
+    {
+      "id": "P3",
+      "title": "Verify local prototype and publish source",
+      "project": "local_prototype",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [
+        "P1",
+        "P2"
+      ],
+      "requires": [
+        "local_implementation_authorized"
+      ],
+      "workflow": "docs/09-local-prototype.md",
+      "section": "Verify local prototype and publish source",
+      "deliverable": "Verify local prototype and publish source",
+      "acceptance": [
+        "Implemented local milestone; limits explicit"
+      ],
+      "test_ids": [],
+      "evidence": [
+        "docs/09-local-prototype.md"
+      ],
+      "on_block": "Report the actual missing capability."
+    },
+    {
+      "project": "local_prototype",
+      "optional": false,
+      "workflow": "docs/10-live-text-connection.md",
+      "test_ids": [],
+      "on_block": "Complete independent work; request only missing user input. Never request secrets in chat.",
+      "id": "P4",
+      "title": "Build bounded OpenAI text adapter and connection interface",
+      "status": "verified",
+      "depends_on": [
+        "P3"
+      ],
+      "requires": [
+        "local_implementation_authorized"
+      ],
+      "section": "Implementation and validation",
+      "deliverable": "Memory-only credentials, text adapter, durable allowance and Connection view",
+      "acceptance": [
+        "34 offline/mocked tests pass; no secret persisted; no automatic paid retry"
+      ],
+      "evidence": [
+        "docs/10-live-text-connection.md"
+      ]
+    },
+    {
+      "project": "local_prototype",
+      "optional": false,
+      "workflow": "docs/10-live-text-connection.md",
+      "test_ids": [],
+      "on_block": "Complete independent work; request only missing user input. Never request secrets in chat.",
+      "id": "P5",
+      "title": "Verify an authorized live text conversation",
+      "status": "verified",
+      "depends_on": [
+        "P4"
+      ],
+      "requires": [
+        "user_enters_api_key_locally",
+        "explicit_test_spending_authorization"
+      ],
+      "section": "Connect and test",
+      "deliverable": "Verified real reply and follow-up context with sanitized usage evidence",
+      "acceptance": [
+        "Real account/model call succeeds",
+        "Saved persona and recent context used",
+        "Reported usage recorded within authorized allowance"
+      ],
+      "evidence": [
+        "docs/10-live-text-connection.md"
+      ]
+    },
+    {
+      "id": "P6",
+      "title": "Explicit durable memory and private document library",
+      "project": "backend",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [
+        "P5"
+      ],
+      "requires": [
+        "local_prototype_implementation"
+      ],
+      "workflow": "docs/11-memory-and-repository-conversations.md",
+      "section": "Technical contract and verification",
+      "deliverable": "Explicit durable memory and private document library",
+      "acceptance": [
+        "Library survives restart and conversation reset",
+        "Deletion fences queued/in-flight replies; imported instructions execute no actions"
+      ],
+      "test_ids": [
+        "local_55_test_regression",
+        "private_state_migration",
+        "browser_library_390px_638px"
+      ],
+      "evidence": [
+        "docs/11-memory-and-repository-conversations.md",
+        "tests/test_knowledge.py"
+      ],
+      "on_block": "Preserve existing private state, report the failed check and continue independent authorized work."
+    },
+    {
+      "id": "P7",
+      "title": "Bounded source-grounded repository conversations",
+      "project": "backend",
+      "status": "verified",
+      "optional": false,
+      "depends_on": [
+        "P6"
+      ],
+      "requires": [
+        "local_prototype_implementation"
+      ],
+      "workflow": "docs/11-memory-and-repository-conversations.md",
+      "section": "Technical contract and verification",
+      "deliverable": "Bounded source-grounded repository conversations",
+      "acceptance": [
+        "Exact document selection and provenance reach synthetic provider",
+        "History is isolated across source and library revisions",
+        "Allowed local documentation is readable; traversal and symlinks denied"
+      ],
+      "test_ids": [
+        "local_55_test_regression",
+        "private_state_migration",
+        "browser_library_390px_638px"
+      ],
+      "evidence": [
+        "docs/11-memory-and-repository-conversations.md",
+        "tests/test_knowledge.py"
+      ],
+      "on_block": "Preserve existing private state, report the failed check and continue independent authorized work."
+    },
+    {
+      "id": "P8",
+      "title": "Read-only adapter for named GitHub repositories",
+      "project": "backend",
+      "status": "deferred",
+      "optional": false,
+      "depends_on": [
+        "P7"
+      ],
+      "requires": [
+        "named_repository_scope",
+        "runtime_read_only_GitHub_credential"
+      ],
+      "workflow": "docs/11-memory-and-repository-conversations.md",
+      "section": "Next implementation sequence",
+      "deliverable": "Explicit source picker and refresh with pinned revisions",
+      "acceptance": [
+        "Runtime credential separated from Codex connector",
+        "Only selected repositories and bounded text paths readable",
+        "Source revision and freshness visible; no writes or agent activation"
+      ],
+      "test_ids": [],
+      "evidence": [],
+      "on_block": "Preserve existing snapshots without adding access or imports; resume only after the current character-first scope changes.",
+      "deferred_reason": "Pete wants the isolated Unreal character first, before adding report/repository access."
     }
   ],
   "status_rule": "verified requires actual evidence; requirements are not grants",
-  "test_catalog": "docs/07-validation-and-operations.md"
+  "test_catalog": "docs/07-validation-and-operations.md",
+  "current_priority": {
+    "as_of": "2026-09-20",
+    "task_order": [
+      "W0",
+      "W1",
+      "W2",
+      "W3",
+      "W4",
+      "A0",
+      "A1"
+    ],
+    "scope": "Isolated Unreal character demo with fabricated/sample greeting; preserve existing app/data and defer added report access, EA, live API calls and generic chat work",
+    "purchase_gate": "Exact host/configuration/region/cost approval and required account steps before provisioning",
+    "persistence": "Save and reopen character identity and scene; 24/7 operation is outside this milestone",
+    "completion_rule": "No host purchase, installation or scene is complete until actual evidence is recorded; other planned tasks remain roadmap only"
+  }
 }
