@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-09-18",
+  "as_of": "2026-09-20",
   "planning_status": "complete",
   "implementation_status": "local_memory_and_source_context_verified",
   "runtime_test_status": "55_offline_tests_passed; browser_library_and_mobile_layout_verified; no_new_paid_calls",
@@ -26,13 +26,21 @@
     "P7"
   ],
   "last_completed_work": "Private saved memory, selected-document context with provenance, bounded local project reads, and source-history isolation; verified without paid API calls",
-  "next_action": "Reconnect the memory-only API key for source-grounded text use; next build named read-only repository refresh, then bounded tools/jobs, then speech",
-  "recommended_first_milestone": [],
+  "next_action": "Complete the authorized remote Windows GPU preparation and final configuration/price handoff; Pete handles checkout/payment, then verify remote access before the isolated Unreal build",
+  "recommended_first_milestone": [
+    "W0",
+    "W1",
+    "W2",
+    "W3",
+    "W4",
+    "A0",
+    "A1"
+  ],
   "parallel_preparation": [],
   "open_decisions": [
-    "Runtime GitHub authentication and named repository scope for automatic refresh",
-    "Preferred distinctive persona",
-    "Later speech usage allowance and GPU/avatar setup"
+    "Final remote Windows GPU checkout configuration/price and recurring storage charge for Pete to review and pay",
+    "Required remote access, installer permissions and Epic account/license steps",
+    "Character appearance and sample greeting for the isolated Unreal demo"
   ],
   "state_privacy": "public_sanitized_summary; actual run records stay private",
   "restart_rule": "Infrastructure restart never activates EA or revives ended/revoked scope; resume only still-valid authorized work after required checks.",
@@ -62,5 +70,27 @@
     "runtime_key_requires_reconnection": true,
     "source_mode": "local_snapshots; no automatic repository refresh",
     "evidence": "docs/11-memory-and-repository-conversations.md"
+  },
+  "current_priority": {
+    "scope": "isolated_Unreal_character_first",
+    "approved_direction": "Remote Windows GPU workstation and one saved character/scene with a fabricated/sample greeting",
+    "spending_status": "final_price_and_recurring_charge_pending_user_checkout_review; no_autonomous_purchase_authority",
+    "workstation_purchased": false,
+    "workstation_installed": false,
+    "unreal_scene_built": false,
+    "initial_persistence": "Saved character identity and scene across launches; no 24/7 operation",
+    "deferred": [
+      "additional_report_or_repository_access",
+      "EA_integration",
+      "new_live_API_calls",
+      "generic_chat_features",
+      "report_connected_dialogue",
+      "continuous_operation"
+    ],
+    "preserve": "Existing Presence app, local data and retained report snapshots; no deletions",
+    "data_boundary": "Use fabricated/sample greeting only; avatar receives no report access or API keys",
+    "copy_limit": "Reading necessarily copies data into memory; cloud AI transmits excerpts. Do not promise read access without copying.",
+    "preparation_authorized": true,
+    "oracle_account_and_instance_status": "not_verified_in_this_phase; do_not_assume_absent"
   }
 }

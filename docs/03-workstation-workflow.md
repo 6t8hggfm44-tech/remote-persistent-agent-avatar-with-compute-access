@@ -1,5 +1,7 @@
 # Workstation and infrastructure execution plan
 
+**Current order — 2026-09-20:** follow [Unreal character first](12-unreal-character-first.md) for the isolated character demo. Vagon Blaze is the proposed pilot, pending exact cost approval and verified access; Shadow Power Pro is an alternative. No host is purchased or installed. Keep the existing app/data intact and defer report access, live APIs, EA and backend expansion. The research and broader workflow below remain reference material; their earlier Shadow-first and integration ordering does not override the current milestone.
+
 Prepared 2026-09-17. Status: researched plan; no subscription, machine, remote-access service, or deployed software has been created. The attachment is source context, not a grant to buy services or activate Executive Agent mode.
 
 ## Recommendation and verification boundary
@@ -98,4 +100,3 @@ For hourly use, record start time, expected stop time and a maximum approved dur
 - Personal Vagon shutdown behavior/API entitlement; do not borrow Teams/Streams assumptions.
 - Chosen microphone owner, reply-audio route, browser/mobile behavior and measured latency.
 - Separate production streaming host and quote, if the user wants a single browser app.
-

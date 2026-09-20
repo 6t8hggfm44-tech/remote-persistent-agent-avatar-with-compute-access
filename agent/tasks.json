@@ -316,11 +316,10 @@
       "project": "workstation",
       "status": "planned",
       "optional": false,
-      "depends_on": [
-        "B0"
-      ],
+      "depends_on": [],
       "requires": [
-        "purchase_authorization_for_subscription_only"
+        "concrete_host_configuration_region_and_cost_approval",
+        "required_provider_account_steps"
       ],
       "workflow": "docs/03-workstation-workflow.md",
       "section": "W0",
@@ -330,7 +329,8 @@
       ],
       "test_ids": [],
       "evidence": [],
-      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion.",
+      "scope_note": "Prepare the quote and access proposal now. This avatar-first workstation decision is independent of the broader backend B0 milestone; purchase/provision remains gated on cost approval."
     },
     {
       "id": "W1",
@@ -382,7 +382,7 @@
     },
     {
       "id": "W3",
-      "title": "Install and pin Unreal compiler Blender toolchain",
+      "title": "Install and pin the Unreal build toolchain",
       "project": "workstation",
       "status": "planned",
       "optional": false,
@@ -395,16 +395,17 @@
       ],
       "workflow": "docs/03-workstation-workflow.md",
       "section": "W3",
-      "deliverable": "Install and pin Unreal compiler Blender toolchain",
+      "deliverable": "Pinned Unreal engine, compiler and prerequisites for the isolated character demo",
       "acceptance": [
-        "Blank Unreal package launches and Blender test renders"
+        "Blank Unreal package launches; installed Unreal/compiler versions and prerequisites are recorded"
       ],
       "test_ids": [
         "T01",
         "T13"
       ],
       "evidence": [],
-      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion."
+      "on_block": "Record precise unmet gate; continue independent authorized work; do not claim completion.",
+      "scope_note": "Install only prerequisites needed for the isolated Unreal demo. Broader Blender and backend setup are outside this milestone."
     },
     {
       "id": "W4",
@@ -574,7 +575,9 @@
       "section": "A1",
       "deliverable": "One MetaHuman and packaged deterministic audio",
       "acceptance": [
-        "One scene package starts editor closed; fixture heard once"
+        "One scene package starts with the editor closed and a fabricated/sample greeting is heard once",
+        "Saved character identity and scene reopen consistently; no claim of 24/7 operation",
+        "Demo is isolated from reports, Presence data, EA and live API keys/calls"
       ],
       "test_ids": [
         "T10",
@@ -927,7 +930,7 @@
       "id": "P8",
       "title": "Read-only adapter for named GitHub repositories",
       "project": "backend",
-      "status": "planned",
+      "status": "deferred",
       "optional": false,
       "depends_on": [
         "P7"
@@ -946,9 +949,26 @@
       ],
       "test_ids": [],
       "evidence": [],
-      "on_block": "Use explicit private document snapshots and name the missing runtime access."
+      "on_block": "Preserve existing snapshots without adding access or imports; resume only after the current character-first scope changes.",
+      "deferred_reason": "Pete wants the isolated Unreal character first, before adding report/repository access."
     }
   ],
   "status_rule": "verified requires actual evidence; requirements are not grants",
-  "test_catalog": "docs/07-validation-and-operations.md"
+  "test_catalog": "docs/07-validation-and-operations.md",
+  "current_priority": {
+    "as_of": "2026-09-20",
+    "task_order": [
+      "W0",
+      "W1",
+      "W2",
+      "W3",
+      "W4",
+      "A0",
+      "A1"
+    ],
+    "scope": "Isolated Unreal character demo with fabricated/sample greeting; preserve existing app/data and defer added report access, EA, live API calls and generic chat work",
+    "purchase_gate": "Exact host/configuration/region/cost approval and required account steps before provisioning",
+    "persistence": "Save and reopen character identity and scene; 24/7 operation is outside this milestone",
+    "completion_rule": "No host purchase, installation or scene is complete until actual evidence is recorded; other planned tasks remain roadmap only"
+  }
 }

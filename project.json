@@ -7,22 +7,23 @@
   "delivery_type": "execution_plan_and_local_prototype",
   "implementation_status": "local_memory_and_source_context_verified",
   "current_scope": [
-    "local_persona_app",
-    "simulated_conversation",
-    "persistent_local_tasks",
-    "tests",
-    "source_repository_persistence",
-    "bounded_openai_text_connection",
-    "explicit_local_memory",
-    "selected_document_conversations",
-    "bounded_read_only_project_references"
+    "preserve_existing_Presence_and_local_data",
+    "prepare_remote_Windows_GPU_cost_and_access_proposal",
+    "provision_workstation_after_concrete_cost_approval_and_account_steps",
+    "build_isolated_Unreal_character_scene_with_fabricated_sample_greeting",
+    "verify_saved_identity_scene_reopening_and_record_packaged_result"
   ],
   "not_authorized_by_this_request": [
-    "purchases",
-    "cloud_deployment",
+    "purchases_without_concrete_cost_approval",
+    "cloud_backend_deployment",
+    "additional_report_or_repository_access",
+    "new_live_API_calls",
+    "generic_chat_features",
     "EA_integration",
     "EA_activation",
-    "new_recurrence"
+    "new_recurrence",
+    "continuous_24_7_operation",
+    "autonomous_checkout_or_paid_storage_recurrence"
   ],
   "entrypoint": "agent/START_HERE.md",
   "instructions": "AGENTS.md",
@@ -60,6 +61,7 @@
     "agent/START_HERE.md",
     "project.json",
     "agent/state.json",
+    "docs/12-unreal-character-first.md",
     "docs/11-memory-and-repository-conversations.md",
     "docs/10-live-text-connection.md",
     "docs/09-local-prototype.md",
@@ -71,12 +73,14 @@
   "recommended_defaults": {
     "control_ui": "browser",
     "native_client": "deferred",
-    "speech": "chained_push_to_talk",
+    "speech": "fabricated_sample_greeting_only; live_voice_deferred",
     "renderer": "packaged_Unreal",
-    "display": "Shadow_initially",
-    "backend": "Python_FastAPI_PostgreSQL_worker",
+    "display": "selected_provider_remote_desktop_after_access_verification",
+    "backend": "preserve_existing_local_Presence; broader_backend_deferred",
     "schedules": "disabled",
-    "audio_retention": "off_by_default"
+    "audio_retention": "off_by_default",
+    "gpu_workstation": "Vagon_Blaze_proposal_pending_exact_cost_approval",
+    "gpu_workstation_alternative": "Shadow_Power_Pro; no_second_subscription_by_default"
   },
   "contracts": [
     "contracts/avatar-event.schema.json",
@@ -100,5 +104,36 @@
     "credential_storage": "process_memory_only",
     "live_verified": true,
     "repository_access": "selected_document_snapshots_and_allowlisted_local_docs; no live GitHub adapter"
+  },
+  "updated_date": "2026-09-20",
+  "implemented_capabilities": [
+    "local_persona_app",
+    "simulated_conversation",
+    "persistent_local_tasks",
+    "tests",
+    "source_repository_persistence",
+    "bounded_openai_text_connection",
+    "explicit_local_memory",
+    "selected_document_conversations",
+    "bounded_read_only_project_references"
+  ],
+  "next_step": "docs/12-unreal-character-first.md",
+  "current_priority": {
+    "milestone": "isolated_Unreal_character_first",
+    "status": "preparation_authorized; final_user_checkout_price_pending; no_host_install_or_scene_completed",
+    "persistence": "saved_character_identity_and_scene_across_launches; not_24_7",
+    "data_access": "fabricated_sample_only; no_reports_or_API_keys_in_avatar",
+    "preservation": "retain_existing_local_app_data_and_report_snapshots; no_deletions",
+    "copy_boundary": "Reading copies data into memory; cloud inference transmits excerpts. Zero-copy access is not promised.",
+    "proposed_budget": {
+      "initial_total_usd_including_fees": 50,
+      "max_powered_on_hours": 5,
+      "recurring_storage_cap_usd_per_month_including_fees": 30,
+      "approval_received": false,
+      "approval_status": "preparation_authorized; spending_and_recurrence_pending_user_checkout_review"
+    },
+    "preparation_authorized": true,
+    "purchase_authority": "Pete handles payment after final price and recurring-charge review; autonomous checkout not authorized",
+    "oracle_status": "Account and instances not verified in this phase; Always Free is a potential later CPU backend, paid GPU needs separate setup and quote"
   }
 }
